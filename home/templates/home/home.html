@@ -9,16 +9,25 @@
     <button type="button" onclick="openBBModal()">Add rabbit</button>
     <div id="rabbitContainer">
     {% for p in parents %}
-        <div class="rabbit-card">
-            <img src="{{ p.image.url }}" alt="{{ p.name }}" width="100" height="100" data-toggle="tooltip" data-placement="bottom" title="" data-title="setTitle({{ p.date_of_birth|date:'Y-m-d' }},{{ p.sex }})">
+        <div class="rabbit-card" class="col-md-3">
+            <img src="{{ p.image.url }}" alt="{{ p.name }}" width="100" height="100" data-bs-boundary="window" 
+                 data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-container="body" 
+                 data-dob="{{ p.date_of_birth|date:'Y-m-d' }}" data-sex="{{ p.sex }}" title="">
         </div>
     {% endfor %}
     </div>
 
-    <script type="javascript">
+    <script type="text/javascript">
 
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
+        $(document).ready(function(){
+            $('[data-dob]').each(function(){
+                var $img = $(this);
+                var dob = $img.attr('data-dob') || '';
+                var sex = $img.attr('data-sex') || '';
+                var title = setTitle(dob, sex);
+                $img.attr('title', title);
+            });
+            $('[data-bs-toggle="tooltip"]').tooltip();
         });
 
         function setSex(abr){
@@ -27,9 +36,9 @@
         }
 
         function setTitle(dob, sex){
+            if (!dob) dob = 'Unknown DOB';
             return dob + " - " + setSex(sex);
         }
-
     </script>
 {% endblock %}
 
