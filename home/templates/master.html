@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}Beans Bunnies{% endblock %}</title>
+        <script type="javasctipt" src="scripts/jquery-4.0.0.min.js"></script>
+        <style>
+            /* Simple modal styles */
+            .bb-modal-backdrop {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.5);
+                align-items: center;
+                justify-content: center;
+                z-index: 1000;
+            }
+            .bb-modal-backdrop.show { display: flex; }
+            .bb-modal {
+                background: #fff;
+                padding: 1.25rem;
+                border-radius: 6px;
+                max-width: 600px;
+                width: 90%;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            }
+            .bb-modal-header { display:flex; justify-content:space-between; align-items:center; }
+            .bb-modal-close { background:none; border:0; font-size:1.25rem; cursor:pointer; }
+        </style>
+    </head>
+    <body>
+        <main>
+            {% block content %}
+            {% endblock %}
+        </main>
+        <!-- Modal markup: hidden by default, shown by adding class 'show' -->
+        <div id="bbModal" class="bb-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+            <div class="bb-modal" role="document">
+                <div class="bb-modal-header">
+                    <h2 id="bbModalLabel">{% block modal_title %}{% endblock %}</h2>
+                    <button type="button" class="bb-modal-close" aria-label="Close" onclick="closeBBModal()">×</button>
+                </div>
+                <div class="bb-modal-body">
+                    {% block modal %}{% endblock %}
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function openBBModal() {
+                const m = document.getElementById('bbModal');
+                if (!m) return;
+                m.classList.add('show');
+                m.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeBBModal() {
+                const m = document.getElementById('bbModal');
+                if (!m) return;
+                m.classList.remove('show');
+                m.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+            }
+            // Close modal when clicking backdrop
+            document.addEventListener('click', function(e){
+                const m = document.getElementById('bbModal');
+                if (!m) return;
+                if (m.classList.contains('show') && e.target === m) closeBBModal();
+            });
+            // Close on Escape
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeBBModal(); });
+        </script>
+    </body>
+</html>
