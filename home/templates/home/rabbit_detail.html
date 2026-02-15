@@ -1,0 +1,46 @@
+{% extends "master.html" %}
+
+{% block title %}
+    {{ rabbit.name }} - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:1rem;">
+  <a href="{% url 'home' %}">&larr; Back to list</a>
+  <h1 style="margin-top:0.5rem;">{{ rabbit.name }}</h1>
+
+  <div style="display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem;">
+    <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" style="max-width:360px; height:auto; border-radius:4px;">
+
+    <div>
+      <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
+      <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
+      <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
+      <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
+
+      <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
+      {% if rabbit.dead %}
+        <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
+        <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
+      {% endif %}
+
+      <p><strong>Parent:</strong>
+        {% if rabbit.parent %}
+          <a href="{% url 'rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
+        {% else %}
+          None
+        {% endif %}
+      </p>
+
+      <p><strong>Children:</strong></p>
+      <ul>
+        {% for c in rabbit.children.all %}
+          <li><a href="{% url 'rabbit_detail' c.id %}">{{ c.name }}</a></li>
+        {% empty %}
+          <li>None</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

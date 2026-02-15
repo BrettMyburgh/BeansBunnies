@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import date
 
@@ -43,3 +43,14 @@ def home(request):
         return redirect('home')
 
     return render(request, 'home/home.html', {'parents': parents})
+
+
+def rabbit_detail(request, pk):
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    return render(request, 'home/rabbit_detail.html', {'rabbit': rabbit})
+
+
+def deceased_list(request):
+    """List all rabbits marked as dead with their reason/date of death."""
+    dead_rabbits = Rabbit.objects.filter(dead=True).order_by('-date_of_death', '-created')
+    return render(request, 'home/deceased.html', {'dead_rabbits': dead_rabbits})

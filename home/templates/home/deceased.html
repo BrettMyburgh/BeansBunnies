@@ -1,0 +1,31 @@
+{% extends "master.html" %}
+
+{% block title %}
+    Deceased rabbits - {{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top:1rem;">
+  <a href="{% url 'home' %}">&larr; Back to list</a>
+  <h1 style="margin-top:0.5rem;">Deceased rabbits</h1>
+
+  {% if dead_rabbits %}
+    <div style="margin-top:1rem; display:flex; flex-direction:column; gap:1rem;">
+      {% for r in dead_rabbits %}
+        <div style="display:flex; gap:1rem; align-items:center; padding:0.5rem; border:1px solid #eee; border-radius:6px;">
+          <a href="{% url 'rabbit_detail' r.id %}">
+            <img src="{{ r.image.url }}" alt="{{ r.name }}" style="width:96px; height:96px; object-fit:cover; border-radius:4px;">
+          </a>
+          <div>
+            <h3 style="margin:0;"><a href="{% url 'rabbit_detail' r.id %}">{{ r.name }}</a></h3>
+            <p style="margin:0.25rem 0;"><strong>Date of death:</strong> {{ r.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
+            <p style="margin:0.25rem 0;"><strong>Reason:</strong> {{ r.cause_of_death|default:"Not recorded" }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No deceased rabbits recorded.</p>
+  {% endif %}
+</div>
+{% endblock %}
