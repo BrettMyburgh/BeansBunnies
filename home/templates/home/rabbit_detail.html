@@ -5,42 +5,122 @@
 {% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top:1rem;">
-  <a href="{% url 'home' %}">&larr; Back to list</a>
-  <h1 style="margin-top:0.5rem;">{{ rabbit.name }}</h1>
+  <div class="container" style="margin-top:1rem;">
+    <a href="{% url 'home' %}">&larr; Back to list</a>
 
-  <div style="display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem;">
-    <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" style="max-width:360px; height:auto; border-radius:4px;">
+    <div style="display:flex; gap:1rem; align-items:center; margin-top:0.5rem;">
+      <h1 style="margin:0;">{{ rabbit.name }}</h1>
+      <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editRabbitModal">Edit</button>
+    </div>
 
-    <div>
-      <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
-      <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
-      <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
-      <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
+    <div style="display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem;">
+      <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" style="max-width:360px; height:auto; border-radius:4px;">
 
-      <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
-      {% if rabbit.dead %}
-        <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
-        <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
-      {% endif %}
+      <div>
+        <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
+        <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
+        <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
+        <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
 
-      <p><strong>Parent:</strong>
-        {% if rabbit.parent %}
-          <a href="{% url 'rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
-        {% else %}
-          None
+        <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
+        {% if rabbit.dead %}
+          <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
+          <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
         {% endif %}
-      </p>
 
-      <p><strong>Children:</strong></p>
-      <ul>
-        {% for c in rabbit.children.all %}
-          <li><a href="{% url 'rabbit_detail' c.id %}">{{ c.name }}</a></li>
-        {% empty %}
-          <li>None</li>
-        {% endfor %}
-      </ul>
+        <p><strong>Parent:</strong>
+          {% if rabbit.parent %}
+            <a href="{% url 'rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
+          {% else %}
+            None
+          {% endif %}
+        </p>
+
+        <p><strong>Children:</strong></p>
+        <ul>
+          {% for c in rabbit.children.all %}
+            <li><a href="{% url 'rabbit_detail' c.id %}">{{ c.name }}</a></li>
+          {% empty %}
+            <li>None</li>
+          {% endfor %}
+        </ul>
+      </div>
     </div>
   </div>
-</div>
+{% endblock %}
+
+{% block modal %}
+  <form method="post" action="{% url 'rabbit_edit' rabbit.id %}" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="modal-header">
+      <h5 class="modal-title" id="editRabbitModalLabel">Edit rabbit — {{ rabbit.name }}</h5>
+      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input name="name" class="form-control" value="{{ rabbit.name }}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Image</label>
+        <input type="file" name="image" class="form-control">
+        <div class="form-text">Current: {{ rabbit.image.name|default:"No image" }}</div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Breed</label>
+          <input name="breed" class="form-control" value="{{ rabbit.breed }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Sex</label>
+          <select name="sex" class="form-select">
+            <option value="M" {% if rabbit.sex == "M" %}selected{% endif %}>Buck</option>
+            <option value="F" {% if rabbit.sex == "F" %}selected{% endif %}>Doe</option>
+            <option value="U" {% if rabbit.sex == "U" %}selected{% endif %}>Unsexed</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Date of birth</label>
+          <input type="date" name="date_of_birth" class="form-control" value="{{ rabbit.date_of_birth|date:'Y-m-d' }}">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Parent</label>
+          <select name="parent" class="form-select">
+            <option value="">None</option>
+            {% for p in parents %}
+              <option value="{{ p.id }}" {% if rabbit.parent and p.id == rabbit.parent.id %}selected{% endif %}>{{ p.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="form-check mb-3">
+        <input class="form-check-input" type="checkbox" value="on" id="deadCheck" name="dead" {% if rabbit.dead %}checked{% endif %}>
+        <label class="form-check-label" for="deadCheck">Deceased</label>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Date of death</label>
+        <input type="date" name="date_of_death" class="form-control" value="{{ rabbit.date_of_death|date:'Y-m-d' }}">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Reason for death</label>
+        <textarea name="cause_of_death" class="form-control" rows="3">{{ rabbit.cause_of_death }}</textarea>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+  </form>
+
 {% endblock %}
