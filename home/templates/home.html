@@ -28,7 +28,9 @@
     </div>
 
     <script type="text/javascript">
-
+        $(document).ready(function() {
+            $('.selectpicker').selectpicker();
+        });
     </script>
 {% endblock %}
 
@@ -49,7 +51,7 @@
         </div>
         <div>
             <label for="id_parent">Parent</label>
-            <select id="parent" class="selectpicker" >
+            <select id="parent" class="selectpicker" multiple>
                 <option value="">No parents available</option>
                 {% for p in parents %}
                     <option value="{{ p.id }}">{{ p }}</option>
@@ -66,7 +68,7 @@
         </div>
         <div>
             <label for="id_sex">Sex</label>
-            <select id="id_sex" name="sex">
+            <select id="id_sex" name="sex" class="selectpicker">
                 <option value="">-- Select sex --</option>
                 <option value="M">Buck</option>
                 <option value="F">Doe</option>

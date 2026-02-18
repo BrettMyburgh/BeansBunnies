@@ -78,3 +78,4 @@ ehthumbs.db
 # Translations
 *.pot
 *.mo
+/static/admin
