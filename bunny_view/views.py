@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import date
 
-from .models import Rabbit
+from db.models import Rabbit
 
 # Create your views here.
 def rabbit_detail(request, pk):

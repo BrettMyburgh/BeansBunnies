@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Rabbit
+from db.models import Rabbit
 
 def deceased_list(request):
     """List all rabbits marked as dead with their reason/date of death."""

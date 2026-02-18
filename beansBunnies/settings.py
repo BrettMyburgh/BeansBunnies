@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'bunny_view',
     'deceased',
     'group_view',
+    'db',
 ]
 
 MIDDLEWARE = [

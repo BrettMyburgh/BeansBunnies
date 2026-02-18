@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Rabbit
+from db.models import Rabbit
 
 # Create your views here.
 def group_view(request):
