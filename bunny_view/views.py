@@ -8,7 +8,7 @@ from .models import Rabbit
 def rabbit_detail(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
-    return render(request, 'home/rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
 
 
 def rabbit_edit(request, pk):

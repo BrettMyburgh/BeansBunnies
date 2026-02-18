@@ -30,7 +30,7 @@
 
         <p><strong>Parent:</strong>
           {% if rabbit.parent %}
-            <a href="{% url 'rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
+            <a href="{% url 'bunny_view:rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
           {% else %}
             None
           {% endif %}
@@ -39,7 +39,7 @@
         <p><strong>Children:</strong></p>
         <ul>
           {% for c in rabbit.children.all %}
-            <li><a href="{% url 'rabbit_detail' c.id %}">{{ c.name }}</a></li>
+            <li><a href="{% url 'bunny_view:rabbit_detail' c.id %}">{{ c.name }}</a></li>
           {% empty %}
             <li>None</li>
           {% endfor %}
@@ -50,7 +50,7 @@
 {% endblock %}
 
 {% block modal %}
-  <form method="post" action="{% url 'rabbit_edit' rabbit.id %}" enctype="multipart/form-data">
+  <form method="post" action="{% url 'bunny_view:rabbit_edit' rabbit.id %}" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="modal-header">
       <h5 class="modal-title" id="editRabbitModalLabel">Edit rabbit — {{ rabbit.name }}</h5>
