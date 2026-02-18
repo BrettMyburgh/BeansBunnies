@@ -1,11 +1,20 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from datetime import date
+from datetime import date, timedelta
 from db.models import Rabbit
 
 
 def home(request):
-    parents = Rabbit.objects.all()
+    rabbits = Rabbit.objects.all()
+    
+    adults_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))
+    juvenile_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=8*7), date_of_birth__gte=date.today()-timedelta(days=14*7))
+    kits_rabbit = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
+    deceased_rabbit = rabbits.filter(date_of_death__isnull=False)
+    
+
+    categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
+
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -41,6 +50,6 @@ def home(request):
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
 
-    return render(request, 'home.html', {'parents': parents})
+    return render(request, 'home.html', {'groups': categories, 'parents': rabbits})
 
 
