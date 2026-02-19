@@ -52,13 +52,22 @@
             </div>
         </div>
 
-        <script>
-            function openBBModal() {
+        <script type="text/javascript">
+            function openBBModal(select = '', sex = '') {
                 const m = document.getElementById('bbModal');
                 if (!m) return;
                 m.classList.add('show');
                 m.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
+                
+                // m.addEventListener('shown.bs.modal', function () {
+                    $('.selectpicker').selectpicker();
+                    var test = select
+                    var test2 = sex
+                    debugger;
+                    console.log('select:'+ select + '   sex:' + sex);
+                    if (select != '') $('#'+select).selectpicker('val', sex);
+                // });
             }
             function closeBBModal() {
                 const m = document.getElementById('bbModal');
@@ -79,10 +88,6 @@
             // Initialize Bootstrap Select
             $(document).ready(function() {
                 $('select.selectpicker').selectpicker();
-            });
-
-            $("#bbModal").on('shown.bs.modal', function () {
-                 $('.selectpicker').selectpicker();
             });
         </script>
     </body>

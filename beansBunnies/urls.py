@@ -24,7 +24,7 @@ urlpatterns = [
     path('',include('home.urls')),
     path('', include('bunny_view.urls')),
     path('deceased/', include('deceased.urls')),
-    path('group/', include('group_view.urls')),
+    path('', include(('group_view.urls', 'group_view'), namespace='group_view')),
 ]
 
 if settings.DEBUG:

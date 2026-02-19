@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from datetime import date, timedelta
 from db.models import Rabbit
 
@@ -51,5 +53,22 @@ def home(request):
         return redirect('home')
 
     return render(request, 'home.html', {'groups': categories, 'parents': rabbits})
+
+
+def categories_ajax(request):
+    sex = request.GET.get('sex', '')
+    rabbits = Rabbit.objects.all()
+    if sex:
+        rabbits = rabbits.filter(sex=sex)
+
+    adults_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))
+    juvenile_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=8*7), date_of_birth__gte=date.today()-timedelta(days=14*7))
+    kits_rabbit = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
+    deceased_rabbit = rabbits.filter(date_of_death__isnull=False)
+
+    categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
+
+    html = render_to_string('home/_rabbit_cards.html', {'groups': categories, 'sex': sex}, request=request)
+    return JsonResponse({'html': html})
 
 

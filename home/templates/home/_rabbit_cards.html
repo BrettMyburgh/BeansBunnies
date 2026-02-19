@@ -1,0 +1,15 @@
+{% if groups %}
+    {% for category, rabbits in groups.items %}
+        {% if rabbits %}
+            <div class="rabbit-card col-md-3">
+                <a href="{% url 'group_view:group_view' category=category sex=sex %}">
+                    <h3>{{ category|title }}</h3>
+                    <img src="{{ rabbits.0.image.url }}" alt="{{ p.name }}" width="100" height="100">
+                    <h6>{{rabbits.count}}</h6>
+                </a>
+            </div>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>No rabbits found. Add one using the button above.</p>
+{% endif %}
