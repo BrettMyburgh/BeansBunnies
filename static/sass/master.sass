@@ -1,10 +1,20 @@
 // Master SASS (indented syntax) for master.html
 // Compile with: sass static/sass/master.sass static/css/master.css --no-source-map
 
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
+
 // Variables
 $body-bg: #ececec
 $primary: #af7239
 $secondary: #f8b5a0
+
+// Font Mixins
+=dynapuff-font
+  font-family: "DynaPuff", system-ui
+  font-optical-sizing: auto
+  font-weight: 400
+  font-style: normal
+  font-variation-settings: "wdth" 100
 
 // Base
 body
@@ -53,7 +63,7 @@ body
 .heading
   color: $secondary
   margin: auto
-  font-family: "Monaco", "Lucida Console", monospace
+  +dynapuff-font
   font-weight: bold
 
 .headingContainer
