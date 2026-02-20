@@ -3,9 +3,11 @@
         {% if rabbits %}
             <div class="rabbitCard col-md-3">
                 <a href="{% url 'group_view:group_view' category=category sex=sex %}">
-                    <h3>{{ category|title }}</h3>
-                    <img src="{{ rabbits.0.image.url }}" alt="{{ p.name }}">
-                    <h6>{{rabbits.count}}</h6>
+                    <img src="{{ rabbits.0.image.url }}" class=".img-fluid" alt="{{ p.name }}">
+                    <div class="imgOverlay">
+                        <h3>{{ category|title }}</h3>
+                        <h6>{{rabbits.count}}</h6>
+                    </div>
                 </a>
             </div>
         {% endif %}

@@ -88,12 +88,23 @@ body
     height: 100%
   img
     width: 100%
+    align-self: center
   h3
     position: absolute
-    top: 10px
+    bottom: 10px
     left: 10px
+    color: $secondary
   h6
     position: absolute
     bottom: 10px
     right: 10px
-    
+    color: $secondary
+
+.imgOverlay
+  content: ""
+  position: absolute
+  top: 0
+  left: 0
+  right: 0
+  bottom: 0
+  background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6))
