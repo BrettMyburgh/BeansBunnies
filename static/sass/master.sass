@@ -2,8 +2,9 @@
 // Compile with: sass static/sass/master.sass static/css/master.css --no-source-map
 
 // Variables
-$body-bg: #f8f9fa
-$primary: #0d6efd
+$body-bg: #ececec
+$primary: #af7239
+$secondary: #f8b5a0
 
 // Base
 body
@@ -26,8 +27,10 @@ body
   align-items: center
   justify-content: center
   z-index: 1000
+
 .bb-modal-backdrop.show
   display: flex
+
 .bb-modal
   background: #fff
   padding: 1.25rem
@@ -35,12 +38,51 @@ body
   max-width: 600px
   width: 90%
   box-shadow: 0 10px 30px rgba(0,0,0,0.2)
+
 .bb-modal-header
-  display:flex
-  justify-content:space-between
-  align-items:center
+  display: flex
+  justify-content: space-between
+  align-items: center
+  
 .bb-modal-close
-  background:none
-  border:0
-  font-size:1.25rem
-  cursor:pointer
+  background: none
+  border: 0
+  font-size: 1.25rem
+  cursor: pointer
+
+.heading
+  color: $secondary
+  margin: auto
+  font-family: "Monaco", "Lucida Console", monospace
+  font-weight: bold
+
+.headingContainer
+  background-color: $primary
+  height: 200px
+  display: flex
+  margin-bottom: 20px
+  position: relative
+
+.headingImage
+  position: absolute
+  bottom: 0
+  left: 10px
+  height: 200px
+
+.btnPrimary
+  background-color: $primary
+  color: #ececec
+  border-radius: 5px
+  margin-bottom: 0
+
+.rabbitCard
+  width: calc((100% - 48px)/ 3);
+  margin-right: 24px;
+  margin-bottom: 24px;
+
+.rabbitCard
+  a
+    width: 100%
+  img
+    width: 100%
+    

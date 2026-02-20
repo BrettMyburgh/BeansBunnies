@@ -5,25 +5,28 @@
 {% endblock %}
 
 {% block content %}
-    <p>Welcome to Beans Bunnies.</p>
-    <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
-        <button id="btnAddRabbit" type="button" onclick="openBBModal()">Add rabbit</button>
-        <!-- <a href="{% url 'deceased' %}" class="btn btn-link" style="padding-left:0.5rem;">View deceased rabbits</a> -->
+    <div style="display: flex; margin-bottom: 5px;">
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+            <button id="btnAddRabbit" type="button" class="btn btnPrimary" onclick="openBBModal()">Add rabbit</button>
+        </div>
+        <div style="display: flex; margin-left: auto;">
+            <span style="margin-top: auto; margin-bottom: auto; margin-right: 5px;">Filter by sex: </span>
+            <select id="sex_select" class="selectpicker">
+                <option value="" default>All</option>
+                <option value="M">Buck</option>
+                <option value="F">Doe</option>
+                <option value="U">Unsexed</option>
+            </select>
+        </div>
     </div>
-    <select id="sex_select" class="selectpicker">
-        <option value="" default>All</option>
-        <option value="M">Buck</option>
-        <option value="F">Doe</option>
-        <option value="U">Unsexed</option>
-    </select>
     <div id="rabbitContainer" class="d-flex">
         {% if groups %}
             {% for category, rabbits in groups.items %}
                 {% if rabbits %}
-                    <div class="rabbit-card col-md-3">
+                    <div class="rabbitCard col-md-3">
                         <a href="{% url 'group_view:group_view' category=category sex='A' %}">
                             <h3>{{ category|title }}</h3>
-                            <img src="{{ rabbits.0.image.url }}" alt="{{ p.name }}" width="100" height="100">
+                            <img src="{{ rabbits.0.image.url }}" alt="{{ p.name }}">
                             <h6>{{rabbits.count}}</h6>
                         </a>
                     </div>
