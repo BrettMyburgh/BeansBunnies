@@ -14,11 +14,16 @@
     <div id="rabbitContainer">
         {% if rabbits %}
             {% for r in rabbits %}
-                <div class="rabbit-card col-md-3">
+                <div class="rabbitCard col-md-3">
                     <a href="{% url 'bunny_view:rabbit_detail' r.id %}" title="{{ r.name }}">
                         <img src="{{ r.image.url }}" alt="{{ r.name }}" width="100" height="100" data-bs-boundary="window" 
                             data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-container="body" 
                             data-dob="{{ r.date_of_birth|date:'Y-m-d' }}" data-sex="{{ r.sex }}" title="">
+                        <div class="imgOverlay" data-bs-boundary="window" data-bs-toggle="tooltip" data-bs-placement="bottom"
+                         data-bs-container="body">
+                            <h3>{{ r.name }}</h3>
+                            <h6>{{r.sex}}</h6>
+                        </div>
                     </a>
                 </div>
             {% endfor %}
@@ -35,7 +40,9 @@
                 var dob = $img.attr('data-dob') || '';
                 var sex = $img.attr('data-sex') || '';
                 var title = setTitle(dob, sex);
+                var sibling = $img.siblings('.imgOverlay');
                 $img.attr('title', title);
+                sibling.attr('title', title);
             });
             $('[data-bs-toggle="tooltip"]').tooltip();
         });

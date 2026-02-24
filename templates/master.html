@@ -66,15 +66,8 @@
                 m.classList.add('show');
                 m.setAttribute('aria-hidden', 'false');
                 document.body.style.overflow = 'hidden';
-                
-                // m.addEventListener('shown.bs.modal', function () {
-                    $('.selectpicker').selectpicker();
-                    var test = select
-                    var test2 = sex
-                    debugger;
-                    console.log('select:'+ select + '   sex:' + sex);
-                    if (select != '') $('#'+select).selectpicker('val', sex);
-                // });
+
+                $('.selectpicker').selectpicker();
             }
             function closeBBModal() {
                 const m = document.getElementById('bbModal');

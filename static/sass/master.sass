@@ -7,6 +7,7 @@
 $body-bg: #ececec
 $primary: #af7239
 $secondary: #f8b5a0
+$breakpoint-tablet: 768px;
 
 // Font Mixins
 =dynapuff-font
@@ -15,6 +16,18 @@ $secondary: #f8b5a0
   font-weight: 400
   font-style: normal
   font-variation-settings: "wdth" 100
+
+// Mixins
+@mixin respond-to($media) 
+  @if $media == 'mobile' 
+    @media (max-width: $breakpoint-mobile) 
+      @content;
+  @else if $media == 'tablet' 
+    @media (max-width: $breakpoint-tablet) 
+      @content;
+  @else if $media == 'desktop' 
+    @media (min-width: $breakpoint-desktop) 
+      @content;
 
 // Base
 body
@@ -109,6 +122,10 @@ body
     bottom: 10px
     right: 10px
     color: $secondary
+  @include respond-to('tablet')
+    width: calc(100% - 48px);
+    margin-right: 24px;
+    margin-bottom: 24px;
 
 .imgOverlay
   content: ""

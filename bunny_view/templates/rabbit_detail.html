@@ -5,18 +5,35 @@
 {% endblock %}
 
 {% block content %}
-  <div class="container" style="margin-top:1rem;">
-    <a href="{% url 'home' %}">&larr; Back to list</a>
+  <div class="container bb-rabbit">
+    <a class="bb-back" href="{% url 'home' %}">&larr; Back to list</a>
 
-    <div style="display:flex; gap:1rem; align-items:center; margin-top:0.5rem;">
-      <h1 style="margin:0;">{{ rabbit.name }}</h1>
-      <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editRabbitModal">Edit</button>
+    <style>
+      .bb-rabbit { margin-top: 1rem; }
+      .bb-back { display:inline-block; margin-bottom: 0.5rem; color: #0d6efd; text-decoration: none; }
+      .bb-header { display:flex; gap:1rem; align-items:center; margin-top:0.5rem; flex-wrap:wrap; }
+      .bb-title { margin:0; font-size:1.5rem; }
+      .bb-actions { margin-left: auto; }
+      .bb-main { display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem; flex-wrap:wrap; }
+      .bb-info { flex:1 1 280px; min-width:220px; }
+      .bb-image { max-width:360px; width:100%; height:auto; border-radius:4px; object-fit:cover; }
+      .bb-info p { margin-bottom: .35rem; }
+      .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
+
+      @media (max-width: 768px) {
+        .bb-main { flex-direction: column-reverse; }
+        .bb-actions { margin-left: 0; width: 100%; display:flex; justify-content:flex-end; }
+        .bb-title { font-size: 1.25rem; }
+        .bb-image { max-width: 100%; }
+      }
+    </style>
+
+    <div class="bb-header">
+      <h1 class="bb-title">{{ rabbit.name }}</h1>
+      <button type="button" class="btn btn-primary btn-sm bb-actions" onclick="openBBModal()">Edit</button>
     </div>
-
-    <div style="display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem;">
-      <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" style="max-width:360px; height:auto; border-radius:4px;">
-
-      <div>
+    <div class="bb-main">
+      <div class="bb-info">
         <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
         <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
         <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
@@ -45,6 +62,7 @@
           {% endfor %}
         </ul>
       </div>
+      <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
     </div>
   </div>
 {% endblock %}
