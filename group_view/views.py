@@ -3,12 +3,11 @@ from django.shortcuts import render
 from db.models import Rabbit # type: ignore
 
 # Create your views here.
-def group_view(request, category, sex=''):
+def group_view(request, category, filter=''):
     rabbits = Rabbit.objects.all()
     parents = rabbits
-    if sex == 'A':
-        sex = ''
-    rabbits = rabbits.filter(sex=sex)
+    if filter != 'A':
+        rabbits = rabbits.filter(sex=filter or filter == '')
 
     match category:
         case 'adults':
@@ -19,4 +18,4 @@ def group_view(request, category, sex=''):
             rabbits = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
         case 'deceased':
             rabbits = rabbits.filter(date_of_death__isnull=False)
-    return render(request, 'group_view.html', {'rabbits': rabbits, 'parents': parents, 'sex': sex})
+    return render(request, 'group_view.html', {'rabbits': rabbits, 'parents': parents, 'sex': filter})

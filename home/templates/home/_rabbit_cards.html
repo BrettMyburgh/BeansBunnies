@@ -2,7 +2,7 @@
     {% for category, rabbits in groups.items %}
         {% if rabbits %}
             <div class="rabbitCard col-md-3">
-                <a href="{% url 'group_view:group_view' category=category sex=sex %}">
+                <a href="{% url 'group_view:group_view' category=category filter=sex %}">
                     <img src="{{ rabbits.0.image.url }}" class=".img-fluid" alt="{{ p.name }}">
                     <div class="imgOverlay">
                         <h3>{{ category|title }}</h3>

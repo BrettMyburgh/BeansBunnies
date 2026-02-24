@@ -24,7 +24,7 @@
             {% for category, rabbits in groups.items %}
                 {% if rabbits %}
                     <div class="rabbitCard col-md-3">
-                        <a href="{% url 'group_view:group_view' category=category sex='A' %}">
+                        <a href="{% url 'group_view:group_view' category=category filter='A' %}">
                             <img src="{{ rabbits.0.image.url }}" class="img-fluid" alt="{{ p.name }}">
                             <div class="imgOverlay">
                                 <h3>{{ category|title }}</h3>
@@ -104,7 +104,7 @@
             </select>
         </div>
         <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
-            <button type="submit">Save</button>
+            <button type="submit">Save</button> <!-- add js verification --> 
             <button type="button" onclick="closeBBModal()">Cancel</button>
         </div>
     </form>

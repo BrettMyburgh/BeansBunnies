@@ -1,3 +1,5 @@
+from re import split
+
 from django.db import models
 
 class Rabbit(models.Model):
@@ -10,6 +12,7 @@ class Rabbit(models.Model):
 	name = models.CharField(max_length=100)
 	image = models.ImageField(upload_to='rabbits/', null=True, blank=False)
 	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
+	# split the parent field into two separate fields for buck and doe
 	breed = models.CharField(max_length=100, blank=True)
 	date_of_birth = models.DateField(null=True, blank=False)
 	sex = models.CharField(max_length=1, choices=SEX_CHOICES, blank=False)
