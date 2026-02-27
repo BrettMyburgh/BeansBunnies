@@ -1,12 +1,18 @@
 // Master SASS (indented syntax) for master.html
 // Compile with: sass static/sass/master.sass static/css/master.css --no-source-map
+@use "bootstrap/bootstrap" with (
+  $body-bg: #ececec,
+  $primary: #af7239,
+  $secondary: #f8b5a0
+)
 
 @import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
 
+
 // Variables
-$body-bg: #ececec
-$primary: #af7239
-$secondary: #f8b5a0
+$body-bg: #ececec;
+$primary: #af7239;
+$secondary: #f8b5a0;
 $breakpoint-tablet: 768px;
 
 // Font Mixins
@@ -135,3 +141,22 @@ body
   right: 0
   bottom: 0
   background-image: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.6))
+
+#div_add_rabbit
+  .row
+    margin-top: 5px
+    margin-bottom: 5px
+    display: flex
+  .form-input
+    @extend .col-md-9
+    margin-top: 0px
+    margin-bottom: 0px
+  label
+    @extend .col-md-3
+    @extend .form-label
+  input
+    @extend .form-control
+  textarea
+    @extend .form-control
+  .dropdown
+    @extend .col-md-9

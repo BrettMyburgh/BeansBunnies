@@ -69,48 +69,59 @@
 {% block modal %}
     <form method="post" action="" enctype="multipart/form-data">
         {% csrf_token %}
-        <div>
-            <label for="id_image">Image</label>
-            <input type="file" id="image" name="image" accept="image/*">
-        </div>
-        <div>
-            <label for="id_name">Name</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div>
-            <label for="id_parent">Parent</label>
-            <select id="parent" class="selectpicker" multiple>
-                <option value="">No parents available</option>
-                {% for p in parents %}
-                    <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
-                {% endfor %}
-            </select>
-            <input type="hidden" id="parent_ids" name="parent_ids">
-        </div>
-        <div>
-            <label for="id_note">Notes</label>
-            <textarea type="text"  id="note" name="note"></textarea>
-        </div>
-        <div>
-            <label for="id_breed">Breed</label>
-            <input type="text" id="breed" name="breed">
-        </div>
-        <div>
-            <label for="id_dob">Date of birth</label>
-            <input type="date" id="dob" name="date_of_birth">
-        </div>
-        <div>
-            <label for="id_sex">Sex</label>
-            <select id="sex" name="sex" class="selectpicker">
-                <option value="A">-- Select sex --</option>
-                <option value="M">Buck</option>
-                <option value="F">Doe</option>
-                <option value="U">Unsexed</option>
-            </select>
-        </div>
-        <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
-            <button type="submit" onclick="modalVerify()">Save</button> <!-- add js verification --> 
-            <button type="button" onclick="closeBBModal()">Cancel</button>
+        <div id="div_add_rabbit">
+            <div class="row">
+                <label for="id_image" class="col-md-3">Image</label>
+                <div class="form-input">
+                    <input type="file" id="image" name="image" accept="image/*" class="col-md-9">
+                </div>
+            </div>
+            <div class="row">
+                <label for="id_name">Name</label>
+                <div class="form-input">
+                    <input type="text" id="name" name="name" required>
+                </div>
+            </div>
+            <div class="row">
+                <label for="id_parent">Parent</label>
+                <select id="parent" class="selectpicker" multiple>
+                    <option value="">No parents available</option>
+                    {% for p in parents %}
+                        <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
+                    {% endfor %}
+                </select>
+                <input type="hidden" id="parent_ids" name="parent_ids">
+            </div>
+            <div class="row">
+                <label for="id_note">Notes</label>
+                <div class="form-input">
+                    <textarea type="text"  id="note" name="note"></textarea>
+                </div>
+            </div>
+            <div class="row">
+                <label for="id_breed">Breed</label>
+                <div class="form-input">
+                    <input type="text" id="breed" name="breed">
+                </div>
+            </div>
+            <div class="row">
+                <label for="id_dob">Date of birth</label>
+                <div class="form-input">
+                    <input type="date" id="dob" name="date_of_birth">
+                </div>
+            </div>
+            <div class="row">
+                <label for="id_sex">Sex</label>
+                <select id="sex" name="sex" class="selectpicker">
+                    <option value="A">-- Select sex --</option>
+                    <option value="M">Buck</option>
+                    <option value="F">Doe</option>
+                    <option value="U">Unsexed</option>
+                </select>
+            </div>
+            <div class="col-md-12" style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+                <button type="submit" class="btn btnPrimary me-0 ms-auto" onclick="modalVerify()">Save</button> <!-- add js verification -->
+            </div>
         </div>
     </form>
 {% endblock %}
