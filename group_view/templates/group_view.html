@@ -47,13 +47,6 @@
             $('[data-bs-toggle="tooltip"]').tooltip();
         });
 
-        $("#bbModal").on('shown.bs.modal', function () {
-            $('.selectpicker').selectpicker();
-            var test = "{{ sex|default:''}}";
-            debugger;
-            $('#sex_select').selectpicker('val', "{{ sex|default:''}}");
-        });
-
         function setSex(abr){
             var lstSex = {'M': 'Buck', 'F': 'Doe', 'U': 'Unsexed'};
             return lstSex[abr] || 'Unknown';

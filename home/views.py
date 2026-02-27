@@ -20,8 +20,8 @@ def home(request):
         name = request.POST.get('name')
         image = request.FILES.get('image')
         parent_ids = request.POST.get('parent_ids').split(',')
-        Buck = None
-        Doe = None
+        buck = None
+        doe = None
         for i in range(len(parent_ids)):
             parent_ids[i] = parent_ids[i].strip()
             parent = None
@@ -29,15 +29,15 @@ def home(request):
                 try:
                     parent = Rabbit.objects.get(pk=parent_ids[i])
                     if parent.sex == 'M':
-                        if not Buck:
-                            Buck = parent
+                        if not buck:
+                            buck = parent
                         else:
                             messages.error(request,
                                 'Only one Buck may be selected. Please try again.')
                             return redirect('home')
                     elif parent.sex == 'F':
-                        if not Doe:
-                            Doe = parent
+                        if not doe:
+                            doe = parent
                         else:
                             messages.error(request,
                                 'Only one Doe may be selected. Please try again.')
@@ -59,8 +59,8 @@ def home(request):
         rabbit = Rabbit.objects.create(
             name=name or '',
             image=image,
-            buck=Buck,
-            doe=Doe,
+            buck=buck,
+            doe=doe,
             breed=breed,
             date_of_birth=dob,
             sex=sex,

@@ -72,6 +72,34 @@ Architecture emphasizes:
 
 ---
 
+## Code Style & Naming Conventions
+
+This project adheres to **PEP 8** Python naming conventions to ensure consistency and maintainability across the codebase:
+
+**Variables & Functions:**
+- Use `snake_case` for variable names and function definitions  
+- Example: `adult_rabbits`, `get_rabbit_by_id()`, `parent_ids`
+
+**Classes:**
+- Use `PascalCase` for class names  
+- Example: `Rabbit`, `BreedingPair`, `HealthRecord`
+
+**Constants:**
+- Use `UPPER_CASE` for module-level constants  
+- Example: `MAX_LITTER_SIZE`, `MIN_AGE_FOR_BREEDING`
+
+**Private Methods/Attributes:**
+- Prefix with a single underscore `_` for internal use  
+- Example: `_validate_rabbit_data()`, `_parent_cache`
+
+**Naming Guidelines:**
+- Use descriptive names that clearly indicate purpose  
+- Avoid single-letter variables except in loops (`i`, `j`) or mathematical contexts  
+- Use full words instead of abbreviations where possible  
+- Keep names concise but meaningful  
+
+---
+
 ## Data Model Relationships
 
 Example relational flow:
