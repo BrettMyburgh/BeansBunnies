@@ -11,8 +11,9 @@ class Rabbit(models.Model):
 
 	name = models.CharField(max_length=100)
 	image = models.ImageField(upload_to='rabbits/', null=True, blank=False)
-	parent = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='children')
+	buck = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='fathered')
 	# split the parent field into two separate fields for buck and doe
+	doe = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='litters')
 	breed = models.CharField(max_length=100, blank=True)
 	date_of_birth = models.DateField(null=True, blank=False)
 	sex = models.CharField(max_length=1, choices=SEX_CHOICES, blank=False)

@@ -21,14 +21,32 @@ def home(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         image = request.FILES.get('image')
-        parent_id = request.POST.get('parent')
-        parent = None
-        if parent_id:
-            try:
-                parent = Rabbit.objects.get(pk=parent_id)
-            except Rabbit.DoesNotExist:
-                parent = None
-
+        parent_ids = request.POST.get('parent_ids').split(',')
+        Buck = None
+        Doe = None
+        for i in range(len(parent_ids)):
+            parent_ids[i] = parent_ids[i].strip()
+            parent = None
+            if parent_ids[i].isdigit():
+                try:
+                    parent = Rabbit.objects.get(pk=parent_ids[i])
+                    if parent.sex == 'M':
+                        if not Buck:
+                            Buck = parent
+                        else:
+                            messages.error(request,
+                                'Only one Buck may be selected. Please try again.')
+                            return redirect('home')
+                    elif parent.sex == 'F':
+                        if not Doe:
+                            Doe = parent
+                        else:
+                            messages.error(request,
+                                'Only one Doe may be selected. Please try again.')
+                            return redirect('home')
+                except Rabbit.DoesNotExist:
+                    parent = None
+        
         breed = request.POST.get('breed', '')
         dob_str = request.POST.get('date_of_birth')
         dob = None
@@ -43,7 +61,8 @@ def home(request):
         rabbit = Rabbit.objects.create(
             name=name or '',
             image=image,
-            parent=parent,
+            buck=Buck,
+            doe=Doe,
             breed=breed,
             date_of_birth=dob,
             sex=sex,

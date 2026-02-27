@@ -66,6 +66,82 @@
                 alert('Name is required.');
                 return false;
             }
+
+            var img = $('#image').val();
+            if (!img) {
+                alert('Image is required.');
+                return false;
+            }
+
+            var parent = $('#parent').val();
+            if (parent && parent.length > 0) {
+                var parentIds = parent.map(function(id) { return parseInt(id); });
+                if (parentIds.includes(NaN)) {
+                    alert('Invalid parent selection.');
+                    return false;
+                }
+            }
+            if (parent && parent.length > 2) {
+                alert('You can select up to 2 parents.');
+                return false;
+            }
+
+            if (parent && parent.length > 1) {
+                var buckCount = $('#parent option:selected').filter(function() {
+                    return $(this).data('sex') === 'M';
+                }).length;
+                if (buckCount > 1) {
+                    alert('Only one Buck may be selected.');
+                    return false;
+                }
+                var doeCount = $('#parent option:selected').filter(function() {
+                    return $(this).data('sex') === 'F';
+                }).length;
+                if (doeCount > 1) {
+                    alert('Only one Doe may be selected.');
+                    return false;
+                }
+            }
+
+            var parentids = parent ? parent.map(function(id) { return parseInt(id); }) : [];
+            $('#parent_ids').val(parentids.join(','));
+
+            var breed = $('#breed').val().trim();
+            if (breed && breed.length > 100) {
+                alert('Breed must be less than 100 characters.');
+                return false;
+            }
+            if (breed && breed == ""){
+                $('#breed').val('Unknown');
+            }
+            if (breed && /[^a-zA-Z]/.test(breed)) {
+                alert('Breed can only contain letters.');
+                return false;
+            }
+
+            var dob = $('#dob').val();
+            if (dob == "") {
+                alert('Date of birth is required.');
+                return false;
+            }
+            var dobDate = new Date(dob);
+            var today = new Date();
+            if (isNaN(dobDate.getTime())) {
+                alert('Invalid date of birth.');
+                return false;
+            }
+            if (dobDate > today) {
+                alert('Date of birth cannot be in the future.');
+                return false;
+            }
+
+            var sex = $('#sex').val();
+            if (!['M', 'F', 'U'].includes(sex)) {
+                alert('Please select a valid sex.');
+                return false;
+            }
+
+
             return true;
         }
     </script>
@@ -80,7 +156,7 @@
         {% csrf_token %}
         <div>
             <label for="id_image">Image</label>
-            <input type="file" id="id_image" name="image" accept="image/*">
+            <input type="file" id="image" name="image" accept="image/*">
         </div>
         <div>
             <label for="id_name">Name</label>
@@ -91,9 +167,14 @@
             <select id="parent" class="selectpicker" multiple>
                 <option value="">No parents available</option>
                 {% for p in parents %}
-                    <option value="{{ p.id }}">{{ p }}</option>
+                    <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
                 {% endfor %}
             </select>
+            <input type="hidden" id="parent_ids" name="parent_ids">
+        </div>
+        <div>
+            <label for="id_note">Notes</label>
+            <textarea type="text"  id="note" name="note"></textarea>
         </div>
         <div>
             <label for="id_breed">Breed</label>
