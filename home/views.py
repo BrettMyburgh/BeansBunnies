@@ -14,9 +14,7 @@ def home(request):
     kits_rabbit = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
     deceased_rabbit = rabbits.filter(date_of_death__isnull=False)
     
-
     categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
-
 
     if request.method == 'POST':
         name = request.POST.get('name')

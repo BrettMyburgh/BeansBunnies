@@ -1,5 +1,6 @@
 from datetime import date, timedelta
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from db.models import Rabbit # type: ignore
 
 # Create your views here.
@@ -9,6 +10,59 @@ def group_view(request, category, filter=''):
     if filter != 'A':
         rabbits = rabbits.filter(sex=filter or filter == '')
 
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        image = request.FILES.get('image')
+        parent_ids = request.POST.get('parent_ids').split(',')
+        Buck = None
+        Doe = None
+        for i in range(len(parent_ids)):
+            parent_ids[i] = parent_ids[i].strip()
+            parent = None
+            if parent_ids[i].isdigit():
+                try:
+                    parent = Rabbit.objects.get(pk=parent_ids[i])
+                    if parent.sex == 'M':
+                        if not Buck:
+                            Buck = parent
+                        else:
+                            messages.error(request,
+                                'Only one Buck may be selected. Please try again.')
+                            return redirect(request.path)
+                    elif parent.sex == 'F':
+                        if not Doe:
+                            Doe = parent
+                        else:
+                            messages.error(request,
+                                'Only one Doe may be selected. Please try again.')
+                            return redirect(request.path)
+                except Rabbit.DoesNotExist:
+                    parent = None
+        
+        breed = request.POST.get('breed', '')
+        dob_str = request.POST.get('date_of_birth')
+        dob = None
+        if dob_str:
+            try:
+                dob = date.fromisoformat(dob_str)
+            except Exception:
+                dob = None
+
+        sex = request.POST.get('sex', '')
+
+        rabbit = Rabbit.objects.create(
+            name=name or '',
+            image=image,
+            buck=Buck,
+            doe=Doe,
+            breed=breed,
+            date_of_birth=dob,
+            sex=sex,
+        )
+
+        messages.success(request, 'Saved rabbit: {}'.format(rabbit))
+        return redirect(request.path)
+    
     match category:
         case 'adults':
             rabbits = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))

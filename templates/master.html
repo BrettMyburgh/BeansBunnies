@@ -100,6 +100,90 @@
             $(document).ready(function() {
                 $('select.selectpicker').selectpicker();
             });
+
+            function modalVerify() {
+                var name = $('#name').val().trim();
+                if (!name) {
+                    alert('Name is required.');
+                    return false;
+                }
+
+                var img = $('#image').val();
+                if (!img) {
+                    alert('Image is required.');
+                    return false;
+                }
+
+                var parent = $('#parent').val();
+                if (parent && parent.length > 0) {
+                    var parentIds = parent.map(function(id) { return parseInt(id); });
+                    if (parentIds.includes(NaN)) {
+                        alert('Invalid parent selection.');
+                        return false;
+                    }
+                }
+                if (parent && parent.length > 2) {
+                    alert('You can select up to 2 parents.');
+                    return false;
+                }
+
+                if (parent && parent.length > 1) {
+                    var buckCount = $('#parent option:selected').filter(function() {
+                        return $(this).data('sex') === 'M';
+                    }).length;
+                    if (buckCount > 1) {
+                        alert('Only one Buck may be selected.');
+                        return false;
+                    }
+                    var doeCount = $('#parent option:selected').filter(function() {
+                        return $(this).data('sex') === 'F';
+                    }).length;
+                    if (doeCount > 1) {
+                        alert('Only one Doe may be selected.');
+                        return false;
+                    }
+                }
+
+                var parentids = parent ? parent.map(function(id) { return parseInt(id); }) : [];
+                $('#parent_ids').val(parentids.join(','));
+
+                var breed = $('#breed').val().trim();
+                if (breed && breed.length > 100) {
+                    alert('Breed must be less than 100 characters.');
+                    return false;
+                }
+                if (breed && breed == ""){
+                    $('#breed').val('Unknown');
+                }
+                if (breed && /[^a-zA-Z]/.test(breed)) {
+                    alert('Breed can only contain letters.');
+                    return false;
+                }
+
+                var dob = $('#dob').val();
+                if (dob == "") {
+                    alert('Date of birth is required.');
+                    return false;
+                }
+                var dobDate = new Date(dob);
+                var today = new Date();
+                if (isNaN(dobDate.getTime())) {
+                    alert('Invalid date of birth.');
+                    return false;
+                }
+                if (dobDate > today) {
+                    alert('Date of birth cannot be in the future.');
+                    return false;
+                }
+
+                var sex = $('#sex').val();
+                if (!['M', 'F', 'U'].includes(sex)) {
+                    alert('Please select a valid sex.');
+                    return false;
+                }
+                
+                return true;
+            }
         </script>
     </body>
 </html>
