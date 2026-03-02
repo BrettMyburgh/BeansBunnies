@@ -38,8 +38,8 @@
     <body>
         <main>
             <div class="container" style="margin-top:1rem;">
-                <div id="titleContainer" class="headingContainer">
-                    <img class="headingImage" src="{% static 'admin/img/logo.png' %}" alt="Beans Bunnies">
+                <div id="title_container" class="heading_container">
+                    <img class="heading_image" src="{% static 'admin/img/logo.png' %}" alt="Beans Bunnies">
                     <h1 class="heading">Beans Bunnies</h1>
                 </div>
 
@@ -58,11 +58,11 @@
             </div>
         </main>
         <!-- Modal markup: hidden by default, shown by adding class 'show' -->
-        <div id="bbModal" class="bb-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+        <div id="bb_modal" class="bb-modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
             <div class="bb-modal" role="document">
                 <div class="bb-modal-header">
-                    <h2 id="bbModalLabel">{% block modal_title %}{% endblock %}</h2>
-                    <button type="button" class="bb-modal-close" aria-label="Close" onclick="closeBBModal()">×</button>
+                    <h2 id="bb_modal_label">{% block modal_title %}{% endblock %}</h2>
+                    <button type="button" class="bb-modal-close" aria-label="Close" onclick="close_bb_modal()">×</button>
                 </div>
                 <div class="bb-modal-body">
                     {% block modal %}{% endblock %}
@@ -71,8 +71,8 @@
         </div>
 
         <script type="text/javascript">
-            function openBBModal() {
-                const m = document.getElementById('bbModal');
+            function open_bb_modal() {
+                const m = document.getElementById('bb_modal');
                 if (!m) return;
                 m.classList.add('show');
                 m.setAttribute('aria-hidden', 'false');
@@ -80,8 +80,8 @@
 
                 $('.selectpicker').selectpicker();
             }
-            function closeBBModal() {
-                const m = document.getElementById('bbModal');
+            function close_bb_modal() {
+                const m = document.getElementById('bb_modal');
                 if (!m) return;
                 m.classList.remove('show');
                 m.setAttribute('aria-hidden', 'true');
@@ -89,19 +89,19 @@
             }
             // Close modal when clicking backdrop
             document.addEventListener('click', function(e){
-                const m = document.getElementById('bbModal');
+                const m = document.getElementById('bb_modal');
                 if (!m) return;
-                if (m.classList.contains('show') && e.target === m) closeBBModal();
+                if (m.classList.contains('show') && e.target === m) close_bb_modal();
             });
             // Close on Escape
-            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') closeBBModal(); });
+            document.addEventListener('keydown', function(e){ if (e.key === 'Escape') close_bb_modal(); });
             
             // Initialize Bootstrap Select
             $(document).ready(function() {
                 $('select.selectpicker').selectpicker();
             });
 
-            function modalVerify() {
+            function modal_verify() {
                 var name = $('#name').val().trim();
                 if (!name) {
                     alert('Name is required.');

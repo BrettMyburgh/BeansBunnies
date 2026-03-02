@@ -85,14 +85,14 @@ body
   +dynapuff-font
   font-weight: bold
 
-.headingContainer
+.heading_container
   background-color: $primary
   height: 200px
   display: flex
   margin-bottom: 20px
   position: relative
 
-.headingImage
+.heading_image
   position: absolute
   bottom: 0
   left: 10px
@@ -116,8 +116,12 @@ body
     position: relative
     height: 100%
   img
-    width: 100%
+    max-width: 100%
+    max-height: 230px
+    width: auto
+    height: auto
     align-self: center
+    margin: auto
   h3
     position: absolute
     bottom: 10px
@@ -160,3 +164,26 @@ body
     @extend .form-control
   .dropdown
     @extend .col-md-9
+
+.deceased
+  filter: grayscale(100%)
+  -webkit-filter: grayscale(100%)
+
+.accordion-button
+  background-color: $primary !important
+  color: $secondary !important
+.accordion-button:not(.collapsed)
+  color: $secondary !important
+.accordion-button::after
+  color: $secondary !important
+
+.accordion-collapse
+  background-color: $body-bg
+.bb-modal
+  background-color: $body-bg !important
+
+.accordion
+  padding-top: 1rem
+
+.accordion-button
+  border-radius: 5px !important

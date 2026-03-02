@@ -5,10 +5,8 @@
 {% endblock %}
 
 {% block content %}
-    <p>Welcome to Beans Bunnies.</p>
     <div style="display:flex; gap:0.5rem; align-items:center; margin-bottom:0.5rem;">
-        <button type="button" onclick="openBBModal('sex', '{{ sex }}')">Add rabbit</button>
-        <a href="{% url 'deceased' %}" class="btn btn-link" style="padding-left:0.5rem;">View deceased rabbits</a>
+        <button type="button" class="btn btnPrimary" onclick="open_bb_modal()">Add rabbit</button>
     </div>
 
     <div id="rabbitContainer">
@@ -68,7 +66,7 @@
         {% csrf_token %}
         <div id="div_add_rabbit">
             <div class="row">
-                <label for="id_image" class="col-md-3">Image</label>
+                <label for="id_image" class="col-md-3">Image</label> <!-- make nullable with template img-->
                 <div class="form-input">
                     <input type="file" id="image" name="image" accept="image/*" class="col-md-9">
                 </div>
@@ -90,19 +88,13 @@
                 <input type="hidden" id="parent_ids" name="parent_ids">
             </div>
             <div class="row">
-                <label for="id_note">Notes</label>
-                <div class="form-input">
-                    <textarea type="text"  id="note" name="note"></textarea>
-                </div>
-            </div>
-            <div class="row">
                 <label for="id_breed">Breed</label>
                 <div class="form-input">
                     <input type="text" id="breed" name="breed">
                 </div>
             </div>
             <div class="row">
-                <label for="id_dob">Date of birth</label>
+                <label for="id_dob">Date of birth</label> <!--make unknown an option-->
                 <div class="form-input">
                     <input type="date" id="dob" name="date_of_birth">
                 </div>
@@ -116,8 +108,33 @@
                     <option value="U">Unsexed</option>
                 </select>
             </div>
+            <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        Additional info
+                    </button>
+                    </h2>
+                    <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                        <div class="accordion-body">
+                            <div class="row">
+                                <label for="id_note">Notes</label>
+                                <div class="form-input">
+                                    <textarea type="text"  id="note" name="note"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <label for="id_temprament">Temprament</label>
+                                <div class="form-input">
+                                    <input type="text" id="temprament" name="temprament">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-md-12" style="margin-top:0.75rem; display:flex; gap:0.5rem;">
-                <button type="submit" class="btn btnPrimary me-0 ms-auto" onclick="modalVerify()">Save</button> <!-- add js verification -->
+                <button type="submit" class="btn btnPrimary me-0 ms-auto" onclick="modal_verify()">Save</button> <!-- add js verification -->
             </div>
         </div>
     </form>
