@@ -99,6 +99,11 @@
             // Initialize Bootstrap Select
             $(document).ready(function() {
                 $('select.selectpicker').selectpicker();
+                $("input[type='date']").each(function(index, item) {
+                    $(this).on('focus', function(event) {
+                            this.showPicker();
+                    });
+                });
             });
 
             function modal_verify() {

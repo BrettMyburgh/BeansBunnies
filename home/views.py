@@ -85,6 +85,9 @@ def categories_ajax(request):
 
     categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
 
+    if sex == '':
+        sex = 'A'
+
     html = render_to_string('home/_rabbit_cards.html', {'groups': categories, 'sex': sex}, request=request)
     return JsonResponse({'html': html})
 
