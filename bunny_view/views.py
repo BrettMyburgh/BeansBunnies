@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import date
+from django.http import HttpResponseRedirect
 
 from db.models import Rabbit
 
@@ -8,15 +9,17 @@ from db.models import Rabbit
 def rabbit_detail(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
+    request.session['previous_page'] = request.META.get('HTTP_REFERER')
     return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
 
 
 def rabbit_edit(request, pk):
     """Handle POST from the detail-page modal to update a rabbit."""
     rabbit = get_object_or_404(Rabbit, pk=pk)
+    parents = Rabbit.objects.exclude(pk=pk).order_by('name')
 
     if request.method != 'POST':
-        return redirect('rabbit_detail', pk=pk)
+        return redirect('bunny_view:rabbit_detail', pk=pk)
 
     # basic fields
     name = request.POST.get('name', rabbit.name)
@@ -71,4 +74,9 @@ def rabbit_edit(request, pk):
     rabbit.save()
 
     messages.success(request, 'Updated rabbit: {}'.format(rabbit))
-    return redirect('rabbit_detail', pk=pk)
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
+
+def rabbit_delete(request, pk):
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    rabbit.delete()
+    return redirect(request.session.get('previous_page'))

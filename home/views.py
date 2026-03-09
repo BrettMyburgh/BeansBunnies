@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from datetime import date, timedelta
+from django.core.files import File
+from django.conf import settings
 from db.models import Rabbit
 
 
@@ -12,13 +14,33 @@ def home(request):
     adults_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))
     juvenile_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=8*7), date_of_birth__gte=date.today()-timedelta(days=14*7))
     kits_rabbit = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
+    undated_rabbit = rabbits.filter(date_of_birth__isnull=True)
     deceased_rabbit = rabbits.filter(date_of_death__isnull=False)
     
-    categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
+    categories = {"Adults":adults_rabbit, "Juvenile":juvenile_rabbit, "Kits":kits_rabbit, "Undated":undated_rabbit, "Deceased":deceased_rabbit}
+
+    list_categories = []
+    if(adults_rabbit != None):
+        list_categories.append("Adults")
+    if(juvenile_rabbit != None):
+        list_categories.append("Juvenile")
+    if(kits_rabbit != None):
+        list_categories.append("Kits")
+    if(undated_rabbit != None):
+        list_categories.append("Undated")
+    if(deceased_rabbit != None):
+        list_categories.append("Deceased")
+
+    request.session["categories"] = list_categories
+    request.session.modified = True
 
     if request.method == 'POST':
         name = request.POST.get('name')
         image = request.FILES.get('image')
+        img_file = None
+        if image is None:
+            img_file = open(settings.BASE_DIR / 'static/admin/img/Default.png', 'rb')
+            image = File(img_file, name='Default.png')
         parent_ids = request.POST.get('parent_ids').split(',')
         buck = None
         doe = None
@@ -65,7 +87,8 @@ def home(request):
             date_of_birth=dob,
             sex=sex,
         )
-
+        if img_file:
+            img_file.close()
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
 
@@ -81,9 +104,10 @@ def categories_ajax(request):
     adults_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))
     juvenile_rabbit = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=8*7), date_of_birth__gte=date.today()-timedelta(days=14*7))
     kits_rabbit = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
+    undated_rabbit = rabbits.filter(date_of_birth__isnull=True)
     deceased_rabbit = rabbits.filter(date_of_death__isnull=False)
 
-    categories = {"adults":adults_rabbit, "juvenile":juvenile_rabbit, "kits":kits_rabbit, "deceased":deceased_rabbit}
+    categories = {"Adults":adults_rabbit, "Juvenile":juvenile_rabbit, "Kits":kits_rabbit, "Undated":undated_rabbit, "Deceased":deceased_rabbit}
 
     if sex == '':
         sex = 'A'

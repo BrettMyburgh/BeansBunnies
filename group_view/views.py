@@ -64,12 +64,14 @@ def group_view(request, category, filter=''):
         return redirect(request.path)
     
     match category:
-        case 'adults':
+        case 'Adults':
             rabbits = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))
-        case 'juvenile':
+        case 'Juvenile':
             rabbits = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=8*7), date_of_birth__gte=date.today()-timedelta(days=14*7))
-        case 'kits':
+        case 'Kits':
             rabbits = rabbits.filter(date_of_birth__gte=date.today() - timedelta(days=8*7))
-        case 'deceased':
+        case 'Undated':
+            rabbits = rabbits.filter(date_of_birth__isnull=True)
+        case 'Deceased':
             rabbits = rabbits.filter(date_of_death__isnull=False)
     return render(request, 'group_view.html', {'rabbits': rabbits, 'parents': parents, 'sex': filter})

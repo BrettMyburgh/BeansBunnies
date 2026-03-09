@@ -27,49 +27,54 @@
         .bb-image { max-width: 100%; }
       }
     </style>
-
-    <div class="bb-header">
-      <h1 class="bb-title">{{ rabbit.name }}</h1>
-      <button type="button" class="btn btn-primary btn-sm bb-actions" onclick="open_bb_modal()">Edit</button>
-    </div>
-    <hr />
-    <div class="bb-main">
-      <div class="bb-info">
-        <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
-        <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
-        <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
-        <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
-
-        <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
-        {% if rabbit.dead %}
-          <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
-          <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
-        {% endif %}
-
-        <p><strong>Parent:</strong>
-          {% if rabbit.parent %}
-            <a href="{% url 'bunny_view:rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
-          {% else %}
-            None
-          {% endif %}
-        </p>
-
-        <p><strong>Children:</strong></p>
-        <ul>
-          {% for c in rabbit.children.all %}
-            <li><a href="{% url 'bunny_view:rabbit_detail' c.id %}">{{ c.name }}</a></li>
-          {% empty %}
-            <li>None</li>
-          {% endfor %}
-        </ul>
+    <form method="post" action="{% url 'bunny_view:rabbit_delete' rabbit.id %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="bb-header">
+        <a href="javascript:history.back()">Back</a>
+        <h1 class="bb-title">{{ rabbit.name }}</h1>
+        <button type="button" class="btn btn-primary btn-sm bb-actions" onclick="open_bb_modal()">Edit</button>
+        <button type="submit" class="btn btn-danger btn-sm" >Delete</button>
       </div>
-      {% if rabbit.dead %}
-        <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale">
-      {% else %}
-        <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
-      {% endif %}
-    </div>
+      <hr />
+      <div class="bb-main">
+        <div class="bb-info">
+          <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
+          <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
+          <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
+          <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
+
+          <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
+          {% if rabbit.dead %}
+            <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
+            <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
+          {% endif %}
+
+          <p><strong>Parent:</strong>
+            {% if rabbit.parent %}
+              <a href="{% url 'bunny_view:rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
+            {% else %}
+              None
+            {% endif %}
+          </p>
+
+          <p><strong>Children:</strong></p>
+          <ul>
+            {% for c in rabbit.children.all %}
+              <li><a href="{% url 'bunny_view:rabbit_detail' c.id %}">{{ c.name }}</a></li>
+            {% empty %}
+              <li>None</li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% if rabbit.dead %}
+          <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale">
+        {% else %}
+          <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
+        {% endif %}
+      </div>
+    </form>
   </div>
+
 {% endblock %}
 
 {% block modal %}

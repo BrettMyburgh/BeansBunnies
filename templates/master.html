@@ -37,24 +37,61 @@
     </head>
     <body>
         <main>
-            <div class="container" style="margin-top:1rem;">
-                <div id="title_container" class="heading_container">
-                    <img class="heading_image" src="{% static 'admin/img/logo.png' %}" alt="Beans Bunnies">
-                    <h1 class="heading">Beans Bunnies</h1>
-                </div>
-
-                {% if messages %}
-                    <div class="mt-2">
-                        {% for message in messages %}
-                            <div class="alert alert-{{ message.tags }}" role="alert">
-                                {{ message }}
-                            </div>
-                        {% endfor %}
+            <div class="simpleNav">
+                <nav class="navbar navbar-dark bg-primary navbar-main-container">
+                    <div class="container-fluid">
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarToggleExternalContent" aria-controls="navbarToggleExternalContent" aria-expanded="true" aria-label="Toggle navigation">
+                        <img class="toggle-image" src="{% static 'admin/img/logo.png' %}" alt="Beans Bunnies">
+                        </button>
                     </div>
-                {% endif %}
+                </nav>
+                
+            </div>
+            <div class="d-flex flex-row">
+                <div class="collapse show col-md-2 screen-height navbar-side-container" id="navbarToggleExternalContent">
+                    <div class="bg-primary p-4 screen-height-child">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                            {% if request.path == '/' %} 
+                                <a class="nav-link active" aria-current="page" href="/">Home</a>
+                            {% else %}
+                                <a class="nav-link" aria-current="page" href="/">Home</a>
+                            {% endif %}
+                            </li>
+                            {% if request.session.categories %}
+                                {% for category in request.session.categories %}
+                                    <li class="nav-item">
+                                        {% if category in request.path %}
+                                            <a class="nav-link active" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
+                                        {% else %}
+                                            <a class="nav-link" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
+                                        {% endif %}
+                                    </li>
+                                {% endfor%}
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="site-content">
+                    <div id="title_container" class="heading_container">
+                        <img class="heading_image" src="{% static 'admin/img/logo.png' %}" alt="Beans Bunnies">
+                        <h1 class="heading">Beans Bunnies</h1>
+                    </div>
 
-                {% block content %}
-                {% endblock %}
+                    {% if messages %}
+                        <div class="mt-2">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }}" role="alert">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    <div class="body-container">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+                </div>
             </div>
         </main>
         <!-- Modal markup: hidden by default, shown by adding class 'show' -->
@@ -107,18 +144,6 @@
             });
 
             function modal_verify() {
-                var name = $('#name').val().trim();
-                if (!name) {
-                    alert('Name is required.');
-                    return false;
-                }
-
-                var img = $('#image').val();
-                if (!img) {
-                    alert('Image is required.');
-                    return false;
-                }
-
                 var parent = $('#parent').val();
                 if (parent && parent.length > 0) {
                     var parentIds = parent.map(function(id) { return parseInt(id); });
@@ -160,22 +185,14 @@
                 if (breed && breed == ""){
                     $('#breed').val('Unknown');
                 }
-                if (breed && /[^a-zA-Z]/.test(breed)) {
-                    alert('Breed can only contain letters.');
+                if (breed && /[^a-zA-Z\s]/.test(breed)) {
+                    alert('Breed can only contain letters and spaces.');
                     return false;
                 }
 
                 var dob = $('#dob').val();
-                if (dob == "") {
-                    alert('Date of birth is required.');
-                    return false;
-                }
                 var dobDate = new Date(dob);
                 var today = new Date();
-                if (isNaN(dobDate.getTime())) {
-                    alert('Invalid date of birth.');
-                    return false;
-                }
                 if (dobDate > today) {
                     alert('Date of birth cannot be in the future.');
                     return false;
