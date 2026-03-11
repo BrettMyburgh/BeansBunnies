@@ -30,7 +30,7 @@
     <form method="post" action="{% url 'bunny_view:rabbit_delete' rabbit.id %}" enctype="multipart/form-data">
       {% csrf_token %}
       <div class="bb-header">
-        <a href="javascript:history.back()">Back</a>
+        <a href="{{request.session.previous_page}}">Back</a>
         <h1 class="bb-title">{{ rabbit.name }}</h1>
         <button type="button" class="btn btn-primary btn-sm bb-actions" onclick="open_bb_modal()">Edit</button>
         <button type="submit" class="btn btn-danger btn-sm" >Delete</button>
@@ -66,14 +66,46 @@
             {% endfor %}
           </ul>
         </div>
-        {% if rabbit.dead %}
-          <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale">
-        {% else %}
-          <img src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
-        {% endif %}
+        <div class="d-block">
+          {% if rabbit.dead %}
+            <img id="image" src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale">
+          {% else %}
+            <img id="image" src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
+          {% endif %}
+          <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+        </div>
       </div>
     </form>
   </div>
+
+  <script type="text/javascript">
+    
+        function OpenCrop(){
+          var image = document.getElementById("cropped_image");
+          var file = document.getElementById("image");
+          var save_button = document.getElementById("crop_modal_save");
+          image.setAttribute("src", file.src);
+          open_crop_modal()
+          save_button.removeEventListener("click", SaveCrop)
+          save_button.addEventListener("click",SaveCrop);
+        }
+
+        function SaveCrop(){
+          const canvas = cropper.getCroppedCanvas();
+          const croppedImageData = canvas.toBlob((blob)=>{
+            const rabbitID = '{{rabbit.id}}';
+            var formdata = new FormData();
+            formdata.append("cropped_image", blob, "croppedImage.png");
+            var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+            formdata.append("csrfmiddlewaretoken", csrftoken);
+            $.post("{% url 'bunny_view:rabbit_crop' rabbit.id %}", formdata).done(function(data){
+              location.reload();
+            });
+          },'image/png');
+          
+        }
+        
+  </script>
 
 {% endblock %}
 

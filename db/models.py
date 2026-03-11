@@ -10,7 +10,7 @@ class Rabbit(models.Model):
 	]
 
 	name = models.CharField(max_length=100, null=True, blank=True)
-	image = models.ImageField(upload_to='rabbits/', null=True, blank=False)
+	image = models.ImageField(upload_to='rabbits/', null=False, blank=False, default="rabbits/Default.png")
 	buck = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='fathered')
 	doe = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='litters')
 	note = models.TextField(blank=True, null=True)
@@ -26,6 +26,12 @@ class Rabbit(models.Model):
 	def __str__(self):
 		return self.name or f'Rabbit {self.pk}'
 	
+
+class RabbitImage(models.Model):
+	image_id = models.AutoField(primary_key=True)
+	rabbit_id = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='Rabbit')
+	image = models.ImageField(upload_to='rabbits/', null=False, blank=False)
+
 # class Litters(models.Model):
 # 	litter_id = models.AutoField(primary_key=True)
 # 	litter_number = models.IntegerField(null=False, blank=False)

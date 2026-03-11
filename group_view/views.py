@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from db.models import Rabbit # type: ignore
+from db.models import Rabbit, RabbitImage # type: ignore
 
 # Create your views here.
 def group_view(request, category, filter=''):
@@ -50,19 +50,35 @@ def group_view(request, category, filter=''):
 
         sex = request.POST.get('sex', '')
 
-        rabbit = Rabbit.objects.create(
-            name=name or '',
-            image=image,
-            buck=buck,
-            doe=doe,
-            breed=breed,
-            date_of_birth=dob,
-            sex=sex,
-        )
+        if image == None:
+            rabbit = Rabbit.objects.create(
+                name=name or '',
+                buck=buck,
+                doe=doe,
+                breed=breed,
+                date_of_birth=dob,
+                sex=sex,
+            )
+        else:
+            rabbit = Rabbit.objects.create(
+                name=name or '',
+                image=image,
+                buck=buck,
+                doe=doe,
+                breed=breed,
+                date_of_birth=dob,
+                sex=sex,
+            )
+            image = RabbitImage.objects.create(
+                rabbit_id=rabbit.pk,
+                image=image
+            )
 
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect(request.path)
     
+    request.session['previous_page'] = request.path
+
     match category:
         case 'Adults':
             rabbits = rabbits.filter(date_of_birth__lt=date.today() - timedelta(days=14*7))

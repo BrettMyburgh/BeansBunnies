@@ -106,8 +106,12 @@ body
 
 .rabbitCard
   width: calc((100% - 72px)/ 3);
+  max-width: 230px
   margin-right: 24px;
   margin-bottom: 24px;
+  @include respond-to('tablet')
+    width:100%
+    max-width:100%
 
 .rabbitCard
   a
@@ -121,6 +125,7 @@ body
     width: auto
     height: auto
     align-self: center
+    border-radius: 10px
     margin: auto
   h3
     position: absolute
@@ -225,3 +230,16 @@ body
 
 .navbar-side-container
   border-right: 1px solid $secondary
+
+
+.cropper-container
+  height: calc(100vh - 300px)
+
+.cropper-container
+  .img
+    display: block;
+    max-width: 100%;
+
+#crop_modal_save
+  float: right
+  margin-top: 10px

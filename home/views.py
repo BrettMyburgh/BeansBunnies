@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from datetime import date, timedelta
 from django.core.files import File
 from django.conf import settings
-from db.models import Rabbit
+from db.models import Rabbit, RabbitImage
 
 
 def home(request):
@@ -78,15 +78,29 @@ def home(request):
 
         sex = request.POST.get('sex', '')
 
-        rabbit = Rabbit.objects.create(
-            name=name or '',
-            image=image,
-            buck=buck,
-            doe=doe,
-            breed=breed,
-            date_of_birth=dob,
-            sex=sex,
-        )
+        if image == None:
+            rabbit = Rabbit.objects.create(
+                name=name or '',
+                buck=buck,
+                doe=doe,
+                breed=breed,
+                date_of_birth=dob,
+                sex=sex,
+            )
+        else:
+            rabbit = Rabbit.objects.create(
+                name=name or '',
+                image=image,
+                buck=buck,
+                doe=doe,
+                breed=breed,
+                date_of_birth=dob,
+                sex=sex,
+            )
+            image = RabbitImage.objects.create(
+                rabbit_id=rabbit.pk,
+                image=image
+            )
         if img_file:
             img_file.close()
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))

@@ -3,13 +3,12 @@ from django.contrib import messages
 from datetime import date
 from django.http import HttpResponseRedirect
 
-from db.models import Rabbit
+from db.models import Rabbit, RabbitImage
 
 # Create your views here.
 def rabbit_detail(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
-    request.session['previous_page'] = request.META.get('HTTP_REFERER')
     return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
 
 
@@ -78,5 +77,22 @@ def rabbit_edit(request, pk):
 
 def rabbit_delete(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
+    if rabbit.image.name != "rabbits/Default.png":
+        rabbit.image.delete()
     rabbit.delete()
     return redirect(request.session.get('previous_page'))
+
+def rabbit_crop(request, pk):
+    rabbit_crop = request.FILES.get("cropped_image")
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    parents = Rabbit.objects.exclude(pk=pk).order_by('name')
+    
+    RabbitImage.objects.create(
+        rabbit_id=rabbit,
+        image=rabbit_crop
+    )
+    rabbit_model = Rabbit.objects.get(pk = pk)
+    rabbit_model.image = rabbit_crop
+    rabbit_model.save()
+
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
