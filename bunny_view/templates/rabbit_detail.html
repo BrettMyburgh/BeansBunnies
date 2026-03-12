@@ -49,9 +49,17 @@
             <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
           {% endif %}
 
-          <p><strong>Parent:</strong>
-            {% if rabbit.parent %}
-              <a href="{% url 'bunny_view:rabbit_detail' rabbit.parent.id %}">{{ rabbit.parent }}</a>
+          <p><strong>Buck:</strong>
+            {% if buck %}
+              <a href="{% url 'bunny_view:rabbit_detail' buck.id %}">{{ buck }}</a>
+            {% else %}
+              None
+            {% endif %}
+          </p>
+
+          <p><strong>Doe:</strong>
+            {% if doe %}
+              <a href="{% url 'bunny_view:rabbit_detail' doe.id %}">{{ doe }}</a>
             {% else %}
               None
             {% endif %}
@@ -59,7 +67,7 @@
 
           <p><strong>Children:</strong></p>
           <ul>
-            {% for c in rabbit.children.all %}
+            {% for c in litters %}
               <li><a href="{% url 'bunny_view:rabbit_detail' c.id %}">{{ c.name }}</a></li>
             {% empty %}
               <li>None</li>
@@ -149,15 +157,18 @@
         </div>
       </div>
       <div class="row">
-        <label class="form-label">Parent</label>
-        <div class="form-input">
-          <select name="parent" class="form-select">
-            <option value="">None</option>
+        <label for="id_parent">Parent</label>
+        <select id="parent" class="selectpicker" multiple>
+            <option value="">No parents available</option>
             {% for p in parents %}
-              <option value="{{ p.id }}" {% if rabbit.parent and p.id == rabbit.parent.id %}selected{% endif %}>{{ p.name }}</option>
+              {% if buck == p or doe == p %}
+                <option value="{{ p.id }}" data-sex="{{ p.sex }}" selected>{{ p }}</option>
+              {% else %}
+                  <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
+              {% endif %}
             {% endfor %}
-          </select>
-        </div>
+        </select>
+        <input type="hidden" id="parent_ids" name="parent_ids">
       </div>
       <div class="accordion accordion-flush" id="accordionFlushExample">
         <div class="accordion-item">

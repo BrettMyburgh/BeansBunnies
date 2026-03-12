@@ -9,13 +9,22 @@ from db.models import Rabbit, RabbitImage
 def rabbit_detail(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
+    litters = None
+    if rabbit.sex == "M":
+        litters = Rabbit.objects.filter(buck = rabbit)
+    elif rabbit.sex == "F":
+        litters = Rabbit.objects.filter(doe = rabbit)
+    
+    buck = rabbit.buck
+    doe = rabbit.doe
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': buck, 'doe': doe, 'parents': parents, 'litters':litters})
 
 
 def rabbit_edit(request, pk):
     """Handle POST from the detail-page modal to update a rabbit."""
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
+    
 
     if request.method != 'POST':
         return redirect('bunny_view:rabbit_detail', pk=pk)
@@ -25,15 +34,31 @@ def rabbit_edit(request, pk):
     image = request.FILES.get('image')
 
     # parent (ignore self)
-    parent = None
-    parent_id = request.POST.get('parent')
-    if parent_id:
-        try:
-            parent_obj = Rabbit.objects.get(pk=parent_id)
-            if parent_obj.pk != rabbit.pk:
-                parent = parent_obj
-        except Rabbit.DoesNotExist:
-            parent = None
+    parent_ids = request.POST.get('parent_ids').split(',')
+    buck = None
+    doe = None
+    for i in range(len(parent_ids)):
+        parent_ids[i] = parent_ids[i].strip()
+        parent = None
+        if parent_ids[i].isdigit():
+            try:
+                parent = Rabbit.objects.get(pk=parent_ids[i])
+                if parent.sex == 'M':
+                    if not buck:
+                        buck = parent
+                    else:
+                        messages.error(request,
+                            'Only one Buck may be selected. Please try again.')
+                        return redirect(request.path)
+                elif parent.sex == 'F':
+                    if not doe:
+                        doe = parent
+                    else:
+                        messages.error(request,
+                            'Only one Doe may be selected. Please try again.')
+                        return redirect(request.path)
+            except Rabbit.DoesNotExist:
+                parent = None
 
     breed = request.POST.get('breed', rabbit.breed)
 
@@ -63,7 +88,8 @@ def rabbit_edit(request, pk):
     rabbit.name = name or ''
     if image:
         rabbit.image = image
-    rabbit.parent = parent
+    rabbit.buck=buck
+    rabbit.doe=doe
     rabbit.breed = breed
     rabbit.date_of_birth = dob
     rabbit.sex = sex or ''
@@ -72,8 +98,14 @@ def rabbit_edit(request, pk):
     rabbit.cause_of_death = cause_of_death or ''
     rabbit.save()
 
+    litters = None
+    if rabbit.sex == "M":
+        litters = Rabbit.objects.filter(buck = rabbit)
+    elif rabbit.sex == "F":
+        litters = Rabbit.objects.filter(doe = rabbit)
+
     messages.success(request, 'Updated rabbit: {}'.format(rabbit))
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters': litters})
 
 def rabbit_delete(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
@@ -94,5 +126,10 @@ def rabbit_crop(request, pk):
     rabbit_model = Rabbit.objects.get(pk = pk)
     rabbit_model.image = rabbit_crop
     rabbit_model.save()
+    litters = None
+    if rabbit.sex == "M":
+        litters = Rabbit.objects.filter(buck = rabbit)
+    elif rabbit.sex == "F":
+        litters = Rabbit.objects.filter(doe = rabbit)
 
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'parents': parents})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters':litters})
