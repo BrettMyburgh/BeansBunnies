@@ -29,16 +29,16 @@ class Rabbit(models.Model):
 
 class RabbitImage(models.Model):
 	image_id = models.AutoField(primary_key=True)
-	rabbit_id = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='Rabbit')
+	rabbit_id = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='rabbit')
 	image = models.ImageField(upload_to='rabbits/', null=False, blank=False)
 
-# class Litters(models.Model):
-# 	litter_id = models.AutoField(primary_key=True)
-# 	litter_number = models.IntegerField(null=False, blank=False)
-# 	buck = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='litter_buck')
-# 	doe = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='litter_doe')
-# 	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE)
-# 	litter_date = models.DateField(null=True, blank=True)
+class RabbitLitter(models.Model):
+	litter_id = models.AutoField(primary_key=True)
+	litter_number = models.IntegerField(null=False, blank=False)
+	buck = models.ForeignKey(Rabbit, on_delete=models.CASCADE, null=True, blank=True, related_name='litter_buck')
+	doe = models.ForeignKey(Rabbit, on_delete=models.CASCADE, null=True, blank=True, related_name='litter_doe')
+	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE)
+	litter_date = models.DateField(null=True, blank=True)
 
 # 	def __int__(self):
 # 		return self.litter_id or f'Litter {self.pk}'

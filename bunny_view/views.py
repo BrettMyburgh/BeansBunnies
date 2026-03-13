@@ -3,7 +3,7 @@ from django.contrib import messages
 from datetime import date
 from django.http import HttpResponseRedirect
 
-from db.models import Rabbit, RabbitImage
+from db.models import Rabbit, RabbitImage, RabbitLitter
 
 # Create your views here.
 def rabbit_detail(request, pk):
@@ -11,9 +11,9 @@ def rabbit_detail(request, pk):
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
     litters = None
     if rabbit.sex == "M":
-        litters = Rabbit.objects.filter(buck = rabbit)
+        litters = RabbitLitter.objects.filter(buck = rabbit)
     elif rabbit.sex == "F":
-        litters = Rabbit.objects.filter(doe = rabbit)
+        litters = RabbitLitter.objects.filter(doe = rabbit)
     
     buck = rabbit.buck
     doe = rabbit.doe
@@ -100,9 +100,9 @@ def rabbit_edit(request, pk):
 
     litters = None
     if rabbit.sex == "M":
-        litters = Rabbit.objects.filter(buck = rabbit)
+        litters = RabbitLitter.objects.filter(buck = rabbit)
     elif rabbit.sex == "F":
-        litters = Rabbit.objects.filter(doe = rabbit)
+        litters = RabbitLitter.objects.filter(doe = rabbit)
 
     messages.success(request, 'Updated rabbit: {}'.format(rabbit))
     return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters': litters})
@@ -128,8 +128,8 @@ def rabbit_crop(request, pk):
     rabbit_model.save()
     litters = None
     if rabbit.sex == "M":
-        litters = Rabbit.objects.filter(buck = rabbit)
+        litters = RabbitLitter.objects.filter(buck = rabbit)
     elif rabbit.sex == "F":
-        litters = Rabbit.objects.filter(doe = rabbit)
+        litters = RabbitLitter.objects.filter(doe = rabbit)
 
     return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters':litters})

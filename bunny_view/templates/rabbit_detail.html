@@ -68,7 +68,7 @@
           <p><strong>Children:</strong></p>
           <ul>
             {% for c in litters %}
-              <li><a href="{% url 'bunny_view:rabbit_detail' c.id %}">{{ c.name }}</a></li>
+              <li><a href="{% url 'bunny_view:rabbit_detail' c.rabbit.id %}">{{ c.rabbit.name }}</a></li>
             {% empty %}
               <li>None</li>
             {% endfor %}
