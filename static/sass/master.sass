@@ -199,11 +199,16 @@ body
   filter: grayscale(100%)
 
 .screen-height
-  height: auto
-  min-height: calc(100vh - 66px)
+  height: calc(100vh)
+  flex: 0 0 auto;
+  width: 227px
 
 .screen-height-child
-  height: 100%
+  height: calc(100vh)
+  width: 227px
+  position: fixed
+  border-right: 10px solid $secondary
+  text-align: center
 
 .site-content
   width: 100%
@@ -231,6 +236,29 @@ body
 .navbar-side-container
   border-right: 1px solid $secondary
 
+.navbar-side-container
+  .dropdown-menu
+    position: static
+    float: none
+    background: transparent
+    border: 0
+    padding: 0
+    margin: 0
+    width: 100%
+    text-align: center
+  .dropdown-item
+    color: $secondary
+    padding: 0.5rem 1rem
+  .dropdown-item:hover,
+  .dropdown-item:focus
+    color: #000000
+    background-color: transparent
+  .dropdown-item.active
+    color: #000000
+    background-color: transparent
+  .dropdown-toggle::after
+    margin-left: 0.5rem
+
 
 .cropper-container
   height: calc(100vh - 300px)
@@ -243,3 +271,14 @@ body
 #crop_modal_save
   float: right
   margin-top: 10px
+
+.simpleNav
+  display: none
+  @include respond-to('tablet')
+    display: initial
+
+.litter-bunnies
+  display: flex
+  a
+    margin-left: auto
+    margin-right: auto

@@ -66,13 +66,23 @@
           </p>
 
           <p><strong>Children:</strong></p>
-          <ul>
-            {% for c in litters %}
-              <li><a href="{% url 'bunny_view:rabbit_detail' c.rabbit.id %}">{{ c.rabbit.name }}</a></li>
-            {% empty %}
-              <li>None</li>
+          {% if litters %}
+            {% regroup litters by litter_number as litter_groups %}
+            {% for group in litter_groups %}
+              <div class="litter-group">
+                <p style="text-align: center;"><strong>Litter {{ group.grouper }}</strong></p>
+                <div class="litter-bunnies">
+                  {% for c in group.list %}
+                    <a href="{% url 'bunny_view:rabbit_detail' c.rabbit.id %}">{{ c.rabbit.name }}</a>
+                  {% endfor %}
+                </div>
+              </div>
             {% endfor %}
-          </ul>
+          {% else %}
+            <ul>
+              <li>None</li>
+            </ul>
+          {% endif %}
         </div>
         <div class="d-block">
           {% if rabbit.dead %}

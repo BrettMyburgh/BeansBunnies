@@ -128,8 +128,8 @@ def rabbit_crop(request, pk):
     rabbit_model.save()
     litters = None
     if rabbit.sex == "M":
-        litters = RabbitLitter.objects.filter(buck = rabbit)
+        litters = RabbitLitter.objects.filter(buck = rabbit).order_by("litter_number")
     elif rabbit.sex == "F":
-        litters = RabbitLitter.objects.filter(doe = rabbit)
+        litters = RabbitLitter.objects.filter(doe = rabbit).order_by("litter_number")
 
     return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters':litters})

@@ -51,9 +51,9 @@
                 
             </div>
             <div class="d-flex flex-row">
-                <div class="collapse show col-md-2 screen-height navbar-side-container" id="navbarToggleExternalContent">
-                    <div class="bg-primary p-4 screen-height-child">
-                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <div class="collapse show screen-height navbar-side-container" id="navbarToggleExternalContent">
+                    <div class="bg-primary screen-height-child">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0 pt-4">
                             <li class="nav-item">
                             {% if request.path == '/' %} 
                                 <a class="nav-link active" aria-current="page" href="/">Home</a>
@@ -61,17 +61,22 @@
                                 <a class="nav-link" aria-current="page" href="/">Home</a>
                             {% endif %}
                             </li>
-                            {% if request.session.categories %}
-                                {% for category in request.session.categories %}
-                                    <li class="nav-item">
-                                        {% if category in request.path %}
-                                            <a class="nav-link active" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
-                                        {% else %}
-                                            <a class="nav-link" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
-                                        {% endif %}
-                                    </li>
-                                {% endfor%}
-                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <a id="navGroups" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" data-bs-auto-close="false" >Groups</a>
+                                <ul class="dropdown-menu nav-dropdown-menu">
+                                    {% if request.session.categories %}
+                                        {% for category in request.session.categories %}
+                                            <li>
+                                                {% if category in request.path %}
+                                                    <a class="dropdown-item active" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
+                                                {% else %}
+                                                    <a class="dropdown-item" href="{% url 'group_view:group_view' category=category filter='A' %}">{{ category }}</a>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor%}
+                                    {% endif %}
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -153,6 +158,12 @@
             
             // Initialize Bootstrap Select
             $(document).ready(function() {
+                const dropdownToggleElement = document.getElementById('navGroups');
+                const dropdownInstance = new bootstrap.Dropdown(dropdownToggleElement);
+                if ($(".nav-dropdown-menu").find(".active").length > 0) {
+                    dropdownInstance.show();
+                }
+                dropdownToggleElement.blur();
                 $('select.selectpicker').selectpicker();
                 $("input[type='date']").each(function(index, item) {
                     $(this).on('focus', function(event) {
