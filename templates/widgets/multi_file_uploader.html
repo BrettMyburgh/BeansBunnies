@@ -1,0 +1,270 @@
+{# templates/widgets/file_upload_widget.html #}
+{# ------------------------------------------------------------------ #}
+{# Reusable file-upload widget — drop-in replacement for the ASP.NET  #}
+{# control.  Include directly or render via FileUploadWidget.          #}
+{#                                                                      #}
+{# Required template variables (all provided automatically by the      #}
+{# FileUploadWidget Python class, but can also be set manually when    #}
+{# using {% include %}):                                                #}
+{#   widget_id     – unique string, used to namespace JS & DOM ids     #}
+{#   label         – label text shown above the control                #}
+{#   hidden_name   – name attr for the hidden JSON field               #}
+{#   hidden_value  – initial JSON value (default "[]")                 #}
+{# ------------------------------------------------------------------ #}
+
+{% with wid=widget.widget_id %}
+
+<style>
+  .fu-thumbnail-{{ wid }}:hover {
+    transform: scale(50);
+    z-index: 999999;
+  }
+</style>
+
+{# Hidden field that holds the JSON array of base64 file data #}
+<input type="hidden"
+       id="hidFileData_{{ wid }}"
+       name="{{ widget.hidden_name }}"
+       value="{{ widget.hidden_value|default:'[]' }}" />
+
+{# Label row #}
+<div id="divlblFileUpload_{{ wid }}" class="row mt-2">
+  <label class="col-md-4 col-form-label col-form-label-sm">
+    {{ widget.label|default:"Relevant files/screenshots:" }}
+  </label>
+<!-- </div> -->
+
+{# Upload row #}
+<!-- <div id="divFileUpload_{{ wid }}" class="row"> -->
+  <div class="col-md-9">
+    <div class="control-group">
+      <label for="fuEditUpload_{{ wid }}" class="btn btn-sm btnPrimary" style="width: auto;">
+        Choose Files
+      </label>
+      <input type="file"
+             id="fuEditUpload_{{ wid }}"
+             name="fuEditUpload_{{ wid }}"
+             class="small-font d-none"
+             tabindex="2"
+             multiple
+             accept="image/*" />
+      <span id="revEditSearch_{{ wid }}"
+            class="small-font text-danger"
+            style="visibility: hidden;">
+        Only JPG and PNG files are allowed!
+      </span>
+    </div>
+  </div>
+</div>
+
+{# Loaded-file thumbnails #}
+<div id="divLoadedFiles_{{ wid }}"
+     class="d-flex"
+     style="font-size: small; flex-wrap: wrap;">
+</div>
+
+<script>
+(function () {
+  // ── Namespace everything under a unique widget ID ────────────────────
+  const WID          = "{{ wid }}";
+  const fileInput    = document.getElementById("fuEditUpload_"    + WID);
+  const fileContainer= document.getElementById("divLoadedFiles_"  + WID);
+  const errorSpan    = document.getElementById("revEditSearch_"   + WID);
+  const hiddenField  = document.getElementById("hidFileData_"     + WID);
+
+  // Internal state: array of base64 data-URL strings
+  let fileData = [];
+
+  // ── Sync helpers ──────────────────────────────────────────────────────
+  function syncHiddenField() {
+    hiddenField.value = JSON.stringify(fileData);
+  }
+
+  // ── File-input change handler ─────────────────────────────────────────
+  fileInput.addEventListener("change", function () {
+    const files = fileInput.files;
+    for (let i = 0; i < files.length; i++) {
+      addFileToList(files[i]);
+    }
+  });
+
+  // ── Add a File object as a thumbnail row ──────────────────────────────
+  function addFileToList(file) {
+    const reader   = new FileReader();
+    const fileName = file.name;
+    const fileType = file.type;
+
+    reader.onload = function (e) {
+      const fileContent = reader.result;
+      const allFiles = /(png|jpe?g|gif|svg|webp)/i;
+
+      if (!allFiles.test(fileType)) {
+        errorSpan.style.visibility = "visible";
+        fileInput.value = "";
+        return;
+      }
+
+      errorSpan.style.visibility = "hidden";
+      fileData.push(fileContent);
+      syncHiddenField();
+
+      const imageRegex = /(png|jpe?g|gif|svg|webp)/i;
+      fileContainer.appendChild(
+        buildRow(
+          imageRegex.test(fileType) ? makeImgThumb(fileContent)
+            : /pdf/i.test(fileType) ? makeIconThumb("fa-file-pdf")
+            :                          makeIconThumb("fa-file-excel"),
+          fileName,
+          fileContent
+        )
+      );
+
+      fileInput.value = "";
+    };
+
+    reader.readAsDataURL(file);
+  }
+
+  // ── Build a thumbnail row element ────────────────────────────────────
+  function buildRow(thumbnail, labelText, dataValue) {
+    const row = document.createElement("div");
+    row.className = "d-flex mx-1 mb-1 px-1";
+    row.style.cssText = "border:1px solid; border-radius:5px;";
+
+    const label = document.createElement("span");
+    label.textContent = labelText;
+
+    const btn = document.createElement("button");
+    btn.type       = "button";
+    btn.className  = "btn-close my-auto";
+    btn.style.cssText = "height:5px; width:5px;";
+    btn.dataset.value = dataValue;
+    btn.addEventListener("click", function () {
+      removeFile(this);
+    });
+
+    row.appendChild(thumbnail);
+    row.appendChild(label);
+    row.appendChild(btn);
+    return row;
+  }
+
+  function makeImgThumb(src) {
+    const img = document.createElement("img");
+    img.src       = src;
+    img.alt       = "Attachment";
+    img.className = "d-block my-auto fu-thumbnail-" + WID;
+    img.style.cssText = "max-width:10px; max-height:10px;";
+    return img;
+  }
+
+  function makeIconThumb(faClass) {
+    const i = document.createElement("i");
+    i.className = "far " + faClass + " me-1 d-block my-auto";
+    i.style.cssText = "max-width:10px; max-height:10px;";
+    return i;
+  }
+
+  // ── Remove a file row ────────────────────────────────────────────────
+  function removeFile(button) {
+    const value = button.dataset.value;
+    const idx   = fileData.indexOf(value);
+    if (idx !== -1) { fileData.splice(idx, 1); }
+    syncHiddenField();
+    button.parentElement.remove();
+  }
+
+  // ── Public API ────────────────────────────────────────────────────────
+  // Attach helpers to window so parent pages can call them by widget ID.
+
+  /**
+   * Reset the widget to its empty state.
+   * Call: window["fileUpload_reset_<widget_id>"]();
+   */
+  window["fileUpload_reset_" + WID] = function () {
+    fileInput.value              = "";
+    errorSpan.style.visibility   = "hidden";
+    fileContainer.innerHTML      = "";
+    fileData                     = [];
+    syncHiddenField();
+  };
+
+  /**
+   * Retrieve the current array of base64-encoded file data strings.
+   * Call: window["fileUpload_getData_<widget_id>"]();
+   */
+  window["fileUpload_getData_" + WID] = function () {
+    return fileData.slice();
+  };
+
+  /**
+   * Load existing attachments from the server (replaces loadAttachmentsForFiles).
+   * @param {object} postData   – data to POST to `url`
+   * @param {string} loaderSelector – CSS selector of a loader element to show/hide
+   * @param {string} url        – endpoint that returns { attachments: [...base64...] }
+   *
+   * The endpoint must return JSON: { "attachments": ["data:image/png;base64,...", ...] }
+   *
+   * Call: window["fileUpload_loadAttachments_<widget_id>"](data, "#myLoader", "/api/attachments/");
+   */
+  window["fileUpload_loadAttachments_" + WID] = function (postData, loaderSelector, url) {
+    const loader = document.querySelector(loaderSelector);
+    if (loader) loader.style.display = "block";
+
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCsrfToken(),
+      },
+      body: JSON.stringify(postData),
+    })
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        const attachments = json.attachments || [];
+        const imageRegex  = /(png|jpg|jpeg)/i;
+        const pdfRegex    = /pdf/i;
+
+        attachments.forEach(function (item, index) {
+          fileData.push(item);
+          const mimeHint = item.split(",")[0];
+
+          let thumb;
+          let label;
+
+          if (imageRegex.test(mimeHint)) {
+            thumb = makeImgThumb(item);
+            label = "Image " + index;
+          } else if (pdfRegex.test(mimeHint)) {
+            thumb = makeIconThumb("fa-file-pdf");
+            label = "PDF File " + index;
+          } else {
+            thumb = makeIconThumb("fa-file-excel");
+            label = "Excel File " + index;
+          }
+
+          fileContainer.appendChild(buildRow(thumb, label, item));
+        });
+
+        syncHiddenField();
+        if (loader) loader.style.display = "none";
+      })
+      .catch(function (err) {
+        console.error("fileUpload_loadAttachments error:", err);
+        if (loader) loader.style.display = "none";
+      });
+  };
+
+  // ── CSRF helper (works with Django's default cookie name) ─────────────
+  function getCsrfToken() {
+    const name   = "csrftoken";
+    const cookie = document.cookie.split(";").find(function (c) {
+      return c.trim().startsWith(name + "=");
+    });
+    return cookie ? decodeURIComponent(cookie.trim().slice(name.length + 1)) : "";
+  }
+
+})();
+</script>
+
+{% endwith %}

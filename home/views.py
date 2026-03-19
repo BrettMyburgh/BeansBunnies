@@ -105,8 +105,15 @@ def home(request):
             img_file.close()
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
+    
+    file_uploader = {
+        "widget_id":    "myUpload",
+        "label":        "Images",
+        "hidden_name":  "attachments",
+        "hidden_value": "[]",
+    }
 
-    return render(request, 'home.html', {'groups': categories, 'parents': rabbits})
+    return render(request, 'home.html', {'groups': categories, 'parents': rabbits, 'image_upload': file_uploader})
 
 
 def categories_ajax(request):

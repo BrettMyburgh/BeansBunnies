@@ -84,6 +84,11 @@
                 </div>
             </div>
             <div class="row">
+                {% autoescape off %}
+                    {% include "widgets/multi_file_uploader.html" with widget=image_upload %}
+                {% endautoescape %}
+            </div>
+            <div class="row">
                 <label for="id_name">Name</label>
                 <div class="form-input">
                     <input type="text" id="name" name="name">
