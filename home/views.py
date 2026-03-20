@@ -36,11 +36,12 @@ def home(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        image = request.FILES.get('image')
-        img_file = None
-        if image is None:
-            img_file = open(settings.BASE_DIR / 'static/admin/img/Default.png', 'rb')
-            image = File(img_file, name='Default.png')
+        # image = request.FILES.get('image')
+        all_images = request.POST.get('attachments').strip("'[").strip("]'").split(",")
+        for image in all_images:
+            if image == '' or "data:image" in image:
+                all_images.remove(image)
+        
         parent_ids = request.POST.get('parent_ids').split(',')
         buck = None
         doe = None
@@ -78,7 +79,7 @@ def home(request):
 
         sex = request.POST.get('sex', '')
 
-        if image == None:
+        if all_images.len() == 0:
             rabbit = Rabbit.objects.create(
                 name=name or '',
                 buck=buck,
@@ -90,19 +91,18 @@ def home(request):
         else:
             rabbit = Rabbit.objects.create(
                 name=name or '',
-                image=image,
+                image=all_images[0],
                 buck=buck,
                 doe=doe,
                 breed=breed,
                 date_of_birth=dob,
                 sex=sex,
             )
-            image = RabbitImage.objects.create(
-                rabbit_id=rabbit.pk,
-                image=image
-            )
-        if img_file:
-            img_file.close()
+            for image in all_images:
+                image = RabbitImage.objects.create(
+                    rabbit_id=rabbit.pk,
+                    image=image
+                )
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
     

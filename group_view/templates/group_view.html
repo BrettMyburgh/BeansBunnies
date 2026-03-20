@@ -72,10 +72,9 @@
         {% csrf_token %}
         <div id="div_add_rabbit">
             <div class="row">
-                <label for="id_image" class="col-md-3">Image</label> <!-- make nullable with template img-->
-                <div class="form-input">
-                    <input type="file" id="image" name="image" accept="image/*" class="col-md-9">
-                </div>
+                {% autoescape off %}
+                    {% include "widgets/multi_file_uploader.html" with widget=image_upload %}
+                {% endautoescape %}
             </div>
             <div class="row">
                 <label for="id_name">Name</label>

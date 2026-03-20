@@ -12,7 +12,10 @@ def group_view(request, category, filter=''):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        image = request.FILES.get('image')
+        all_images = request.POST.get('attachments').strip("'[").strip("]'").split(",")
+        for image in all_images:
+            if image == '' or "data:image" in image:
+                all_images.remove(image)
         parent_ids = request.POST.get('parent_ids').split(',')
         buck = None
         doe = None
@@ -50,7 +53,7 @@ def group_view(request, category, filter=''):
 
         sex = request.POST.get('sex', '')
 
-        if image == None:
+        if all_images.len() == 0:
             rabbit = Rabbit.objects.create(
                 name=name or '',
                 buck=buck,
@@ -62,22 +65,30 @@ def group_view(request, category, filter=''):
         else:
             rabbit = Rabbit.objects.create(
                 name=name or '',
-                image=image,
+                image=all_images[0],
                 buck=buck,
                 doe=doe,
                 breed=breed,
                 date_of_birth=dob,
                 sex=sex,
             )
-            image = RabbitImage.objects.create(
-                rabbit_id=rabbit.pk,
-                image=image
-            )
+            for each_image in all_images:
+                image = RabbitImage.objects.create(
+                    rabbit_id=rabbit.pk,
+                    image=each_image
+                )
 
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect(request.path)
     
     request.session['previous_page'] = request.path
+
+    file_uploader = {
+        "widget_id":    "myUpload",
+        "label":        "Images",
+        "hidden_name":  "attachments",
+        "hidden_value": "[]",
+    }
 
     match category:
         case 'Adults':
@@ -90,4 +101,4 @@ def group_view(request, category, filter=''):
             rabbits = rabbits.filter(date_of_birth__isnull=True)
         case 'Deceased':
             rabbits = rabbits.filter(date_of_death__isnull=False)
-    return render(request, 'group_view.html', {'rabbits': rabbits, 'parents': parents, 'sex': filter})
+    return render(request, 'group_view.html', {'rabbits': rabbits, 'parents': parents, 'sex': filter, 'image_upload': file_uploader})
