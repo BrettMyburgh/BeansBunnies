@@ -16,7 +16,7 @@
       .bb-actions { margin-left: auto; }
       .bb-main { display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem; flex-wrap:wrap; }
       .bb-info { flex:1 1 280px; min-width:220px; }
-      .bb-image { max-width:360px; width:100%; height:auto; border-radius:4px; object-fit:cover; }
+      .bb-image {width:100%; height:auto; border-radius:4px; object-fit:cover; }
       .bb-info p { margin-bottom: .35rem; }
       .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
 
@@ -84,8 +84,8 @@
             </ul>
           {% endif %}
         </div>
-        <div class="d-block">
-          <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="d-block col-md-5">
+          <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               {% for image in images %}
                 <div class="carousel-item{% if forloop.first %} active{% endif %}">
@@ -97,16 +97,21 @@
                 </div>
               {% endfor%}
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Next</span>
             </button>
+            <div class="carousel_button_group">
+              <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+              <button id="btnDefault" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Set Default</button>
+              <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Delete Image</button>
+            </div>
           </div>
-          <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+          
         </div>
       </div>
     </form>
@@ -138,6 +143,23 @@
           },'image/png');
           
         }
+
+        var myCarousel = document.getElementById('imagesCarousel')
+
+        myCarousel.addEventListener('slide.bs.carousel', function (event) {
+          var to = event.to +1;
+          var toElement =  document.querySelector(".carousel-inner .active").children[0]
+          var defaultImg = "{{ rabbit.image.url }}";
+          var defaultButton = document.getElementById("btnDefault");
+          console.log(toElement.src);
+          console.log(defaultImg);
+          console.log(toElement.src.includes(defaultImg));
+          if (toElement.src.includes(defaultImg)){
+            defaultButton.setAttribute("disabled", "true");
+          }else{
+            defaultButton.removeAttribute("disabled");
+          }
+        })
         
   </script>
 
