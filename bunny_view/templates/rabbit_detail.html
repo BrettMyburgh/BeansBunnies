@@ -85,11 +85,27 @@
           {% endif %}
         </div>
         <div class="d-block">
-          {% if rabbit.dead %}
-            <img id="image" src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale">
-          {% else %}
-            <img id="image" src="{{ rabbit.image.url }}" alt="{{ rabbit.name }}" class="bb-image">
-          {% endif %}
+          <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              {% for image in images %}
+                <div class="carousel-item">
+                  {% if rabbit.dead %}
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale d-block w-100">
+                  {% else %}
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" class="bb-image d-block w-100">
+                  {% endif %}
+                </div>
+              {% endfor%}
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
           <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
         </div>
       </div>

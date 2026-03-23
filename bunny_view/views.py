@@ -8,6 +8,7 @@ from db.models import Rabbit, RabbitImage, RabbitLitter
 # Create your views here.
 def rabbit_detail(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
+    images = RabbitImage.objects.filter(rabbit_id=rabbit)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
     litters = None
     if rabbit.sex == "M":
@@ -17,7 +18,7 @@ def rabbit_detail(request, pk):
     
     buck = rabbit.buck
     doe = rabbit.doe
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': buck, 'doe': doe, 'parents': parents, 'litters':litters})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': buck, 'doe': doe, 'parents': parents, 'litters':litters, 'images':images})
 
 
 def rabbit_edit(request, pk):
