@@ -5,6 +5,10 @@ from django.template.loader import render_to_string
 from datetime import date, timedelta
 from django.core.files import File
 from django.conf import settings
+from django.core.files.base import ContentFile
+import base64
+import uuid
+import json
 from db.models import Rabbit, RabbitImage
 
 
@@ -37,11 +41,8 @@ def home(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         # image = request.FILES.get('image')
-        all_images = request.POST.get('attachments').strip("'[").strip("]'").split(",")
-        for image in all_images:
-            if image == '' or "data:image" in image:
-                all_images.remove(image)
-        
+        all_images = json.loads(request.POST.get('attachments'))
+                
         parent_ids = request.POST.get('parent_ids').split(',')
         buck = None
         doe = None
@@ -79,7 +80,7 @@ def home(request):
 
         sex = request.POST.get('sex', '')
 
-        if all_images.len() == 0:
+        if len(all_images) == 0:
             rabbit = Rabbit.objects.create(
                 name=name or '',
                 buck=buck,
@@ -89,9 +90,17 @@ def home(request):
                 sex=sex,
             )
         else:
+            if ';base64,' in all_images[0]:
+                format_str, imgstr = all_images[0].split(';base64,')
+                ext = format_str.split('/')[-1]
+            else:
+                imgstr = all_images[0]
+                ext = 'png'
+            data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
+                        
             rabbit = Rabbit.objects.create(
                 name=name or '',
-                image=all_images[0],
+                image=data,
                 buck=buck,
                 doe=doe,
                 breed=breed,
@@ -99,9 +108,16 @@ def home(request):
                 sex=sex,
             )
             for image in all_images:
+                if ';base64,' in all_images[0]:
+                    format_str, imgstr = all_images[0].split(';base64,')
+                    ext = format_str.split('/')[-1]
+                else:
+                    imgstr = all_images[0]
+                    ext = 'png'
+                data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
                 image = RabbitImage.objects.create(
-                    rabbit_id=rabbit.pk,
-                    image=image
+                    rabbit_id=rabbit,
+                    image=data
                 )
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
