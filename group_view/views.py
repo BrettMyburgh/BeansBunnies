@@ -1,6 +1,10 @@
 from datetime import date, timedelta
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.core.files.base import ContentFile
+import base64
+import uuid
+import json
 from db.models import Rabbit, RabbitImage # type: ignore
 
 # Create your views here.
@@ -12,10 +16,7 @@ def group_view(request, category, filter=''):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        all_images = request.POST.get('attachments').strip("'[").strip("]'").split(",")
-        for image in all_images:
-            if image == '' or "data:image" in image:
-                all_images.remove(image)
+        all_images = json.loads(request.POST.get('attachments'))
         parent_ids = request.POST.get('parent_ids').split(',')
         buck = None
         doe = None
@@ -53,7 +54,7 @@ def group_view(request, category, filter=''):
 
         sex = request.POST.get('sex', '')
 
-        if all_images.len() == 0:
+        if len(all_images) == 0:
             rabbit = Rabbit.objects.create(
                 name=name or '',
                 buck=buck,
@@ -63,19 +64,34 @@ def group_view(request, category, filter=''):
                 sex=sex,
             )
         else:
+            if ';base64,' in all_images[0]:
+                format_str, imgstr = all_images[0].split(';base64,')
+                ext = format_str.split('/')[-1]
+            else:
+                imgstr = all_images[0]
+                ext = 'png'
+            data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
+                        
             rabbit = Rabbit.objects.create(
                 name=name or '',
-                image=all_images[0],
+                image=data,
                 buck=buck,
                 doe=doe,
                 breed=breed,
                 date_of_birth=dob,
                 sex=sex,
             )
-            for each_image in all_images:
+            for image in all_images:
+                if ';base64,' in all_images[0]:
+                    format_str, imgstr = all_images[0].split(';base64,')
+                    ext = format_str.split('/')[-1]
+                else:
+                    imgstr = all_images[0]
+                    ext = 'png'
+                data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
                 image = RabbitImage.objects.create(
-                    rabbit_id=rabbit.pk,
-                    image=each_image
+                    rabbit_id=rabbit,
+                    image=data
                 )
 
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
