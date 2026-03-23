@@ -88,7 +88,7 @@
           <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               {% for image in images %}
-                <div class="carousel-item">
+                <div class="carousel-item{% if forloop.first %} active{% endif %}">
                   {% if rabbit.dead %}
                     <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale d-block w-100">
                   {% else %}
