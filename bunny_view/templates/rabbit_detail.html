@@ -16,7 +16,7 @@
       .bb-actions { margin-left: auto; }
       .bb-main { display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem; flex-wrap:wrap; }
       .bb-info { flex:1 1 280px; min-width:220px; }
-      .bb-image { max-width:360px; width:100%; height:auto; border-radius:4px; object-fit:cover; }
+      .bb-image {width:100%; height:auto; border-radius:4px; object-fit:cover; }
       .bb-info p { margin-bottom: .35rem; }
       .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
 
@@ -84,39 +84,65 @@
             </ul>
           {% endif %}
         </div>
-        <div class="d-block">
-          <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="d-block col-md-5">
+          <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
             <div class="carousel-inner">
               {% for image in images %}
-                <div class="carousel-item{% if forloop.first %} active{% endif %}">
+                <div class="carousel-item{% if image.image.url == rabbit.image.url %} active{% endif %}">
                   {% if rabbit.dead %}
-                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" class="bb-image grayscale d-block w-100">
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image grayscale d-block w-100">
                   {% else %}
-                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" class="bb-image d-block w-100">
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image d-block w-100">
                   {% endif %}
                 </div>
               {% endfor%}
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+            <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
               <span class="carousel-control-prev-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Previous</span>
             </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+            <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
               <span class="carousel-control-next-icon" aria-hidden="true"></span>
               <span class="visually-hidden">Next</span>
             </button>
+            <div class="carousel_button_group">
+              <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+              <button id="btnDefault" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="SetDefault()">Set Default</button>
+              <button id="btnDeleteImage" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="DeleteImage()">Delete Image</button>
+            </div>
           </div>
-          <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+          
         </div>
       </div>
     </form>
   </div>
 
   <script type="text/javascript">
+        var currentDefaultImg = "{{ rabbit.image.url|escapejs }}";
+
+        function updateImageActionButtons() {
+          var activeImage = document.querySelector(".carousel-inner .active img");
+          var defaultButton = document.getElementById("btnDefault");
+          var deleteButton = document.getElementById("btnDeleteImage");
+
+          if (!activeImage) {
+            defaultButton.setAttribute("disabled", "true");
+            deleteButton.setAttribute("disabled", "true");
+            return;
+          }
+
+          if (activeImage.src.includes(currentDefaultImg)) {
+            defaultButton.setAttribute("disabled", "true");
+            deleteButton.setAttribute("disabled", "true");
+          } else {
+            defaultButton.removeAttribute("disabled");
+            deleteButton.removeAttribute("disabled");
+          }
+        }
     
         function OpenCrop(){
           var image = document.getElementById("cropped_image");
-          var file = document.getElementById("image");
+          var file = document.querySelector(".carousel-inner .active").children[0]
           var save_button = document.getElementById("crop_modal_save");
           image.setAttribute("src", file.src);
           open_crop_modal()
@@ -135,10 +161,50 @@
             $.post("{% url 'bunny_view:rabbit_crop' rabbit.id %}", formdata).done(function(data){
               location.reload();
             });
-          },'image/png');
-          
+          },'image/png');  
         }
+
+        function SetDefault(){
+          var activeElement =  document.querySelector(".carousel-inner .active").children[0];
+          var imageId = activeElement.getAttribute("data-id");
+          var formdata = new FormData();
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          formdata.append("csrfmiddlewaretoken", csrftoken);
+          formdata.append("image_id", imageId);
+          $.post("{% url 'bunny_view:rabbit_default' rabbit.id %}", formdata).done(function(data){
+              currentDefaultImg = data.rabbit_image;
+              updateImageActionButtons();
+          });
+        }
+
+        function DeleteImage(){
+          var activeElement =  document.querySelector(".carousel-inner .active").children[0];
+          var activeParent =  document.querySelector(".carousel-inner .active");
+          var imageId = activeElement.getAttribute("data-id");
+          var formdata = new FormData();
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          formdata.append("csrfmiddlewaretoken", csrftoken);
+          formdata.append("image_id", imageId);
+          $.post("{% url 'bunny_view:rabbit_image_delete' rabbit.id %}", formdata).done(function(data){
+            var myCarousel = document.getElementById('imagesCarousel');
+            var carousel = new bootstrap.Carousel(myCarousel)
+            carousel.next();
+            activeParent.remove();
+          });
+        }
+
+        var myCarousel = document.getElementById('imagesCarousel');
+
+        myCarousel.addEventListener('slid.bs.carousel', function (event) {
+          updateImageActionButtons();
+        })
         
+        document.addEventListener("DOMContentLoaded",function(){
+          updateImageActionButtons();
+        });
+
+
+
   </script>
 
 {% endblock %}
