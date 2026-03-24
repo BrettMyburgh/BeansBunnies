@@ -108,11 +108,11 @@ def home(request):
                 sex=sex,
             )
             for image in all_images:
-                if ';base64,' in all_images[0]:
-                    format_str, imgstr = all_images[0].split(';base64,')
+                if ';base64,' in image:
+                    format_str, imgstr = image.split(';base64,')
                     ext = format_str.split('/')[-1]
                 else:
-                    imgstr = all_images[0]
+                    imgstr = image
                     ext = 'png'
                 data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
                 image = RabbitImage.objects.create(
