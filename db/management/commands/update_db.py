@@ -9,7 +9,7 @@ class Command(BaseCommand):
             existing_image = RabbitImage.objects.filter(rabbit_id = rabbit).first()
             if existing_image != None:
                 if rabbit.image.name != "rabbits/Default.png":
-                    if rabbit.image.name != existing_image.image.name:
+                    if rabbit.image.url != existing_image.image.url:
                         rabbit.image.delete()
                     rabbit.image = existing_image.image
                     rabbit.save()
