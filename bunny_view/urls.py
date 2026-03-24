@@ -8,4 +8,6 @@ urlpatterns = [
     path('rabbit/<int:pk>/edit/', views.rabbit_edit, name='rabbit_edit'),
     path('rabbit/<int:pk>/delete/', views.rabbit_delete, name='rabbit_delete'),
     path('rabbit/<int:pk>/crop/', views.rabbit_crop, name='rabbit_crop'),
+    path('rabbit/<int:pk>/default/', views.rabbit_default, name='rabbit_default'),
+    path('rabbit/<int:pk>/image-delete/', views.rabbit_image_delete, name='rabbit_image_delete'),
 ]

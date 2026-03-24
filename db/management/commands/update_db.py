@@ -7,8 +7,9 @@ class Command(BaseCommand):
         rabbits = Rabbit.objects.all()
         for rabbit in rabbits:
             existing_image = RabbitImage.objects.filter(rabbit_id = rabbit).first()
-            if existing_image == None:
-                RabbitImage.objects.create(
-                    rabbit_id=rabbit,
-                    image=rabbit.image
-                )
+            if existing_image != None:
+                if rabbit.image.name != "rabbits/Default.png":
+                    if rabbit.image.name != existing_image.image.name:
+                        rabbit.image.delete()
+                    rabbit.image = existing_image.image
+                    rabbit.save()
