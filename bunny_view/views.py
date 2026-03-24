@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from datetime import date
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 
 from db.models import Rabbit, RabbitImage, RabbitLitter
 
@@ -120,17 +120,33 @@ def rabbit_crop(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     parents = Rabbit.objects.exclude(pk=pk).order_by('name')
     
-    RabbitImage.objects.create(
+    cropped = RabbitImage.objects.create(
         rabbit_id=rabbit,
         image=rabbit_crop
     )
     rabbit_model = Rabbit.objects.get(pk = pk)
-    rabbit_model.image = rabbit_crop
+    rabbit_model.image = cropped.image
     rabbit_model.save()
     litters = None
     if rabbit.sex == "M":
         litters = RabbitLitter.objects.filter(buck = rabbit).order_by("litter_number")
     elif rabbit.sex == "F":
         litters = RabbitLitter.objects.filter(doe = rabbit).order_by("litter_number")
+    
+    images = RabbitImage.objects.filter(rabbit_id=rabbit)
 
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters':litters})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': rabbit.buck, 'doe':rabbit.doe, 'parents': parents, 'litters':litters, 'images':images})
+
+def rabbit_default(request, pk):
+    image_id = request.POST.get("image_id")
+    image = get_object_or_404(RabbitImage,image_id=image_id)
+    rabbit = get_object_or_404(Rabbit,pk=pk)
+    rabbit.image = image.image
+    rabbit.save()
+    return JsonResponse({'rabbit_image': rabbit.image.url})
+
+def rabbit_image_delete(request, pk):
+    image_id = request.POST.get("image_id")
+    image = get_object_or_404(RabbitImage,image_id=image_id)
+    image.delete()
+    return JsonResponse({'rabbit_image': image_id})

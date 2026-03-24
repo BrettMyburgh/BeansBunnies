@@ -108,17 +108,23 @@ def home(request):
                 sex=sex,
             )
             for image in all_images:
-                if ';base64,' in image:
-                    format_str, imgstr = image.split(';base64,')
-                    ext = format_str.split('/')[-1]
+                if image == all_images[0]:
+                    image = RabbitImage.objects.create(
+                        rabbit_id=rabbit,
+                        image=rabbit.image
+                    )
                 else:
-                    imgstr = image
-                    ext = 'png'
-                data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
-                image = RabbitImage.objects.create(
-                    rabbit_id=rabbit,
-                    image=data
-                )
+                    if ';base64,' in image:
+                        format_str, imgstr = image.split(';base64,')
+                        ext = format_str.split('/')[-1]
+                    else:
+                        imgstr = image
+                        ext = 'png'
+                    data = ContentFile(base64.b64decode(imgstr),f"{uuid.uuid4()}.{ext}")
+                    image = RabbitImage.objects.create(
+                        rabbit_id=rabbit,
+                        image=data
+                    )
         messages.success(request, 'Saved rabbit: {}'.format(rabbit))
         return redirect('home')
     

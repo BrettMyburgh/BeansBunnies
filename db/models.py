@@ -10,7 +10,7 @@ class Rabbit(models.Model):
 	]
 
 	name = models.CharField(max_length=100, null=True, blank=True)
-	image = models.ImageField(upload_to='rabbits/', null=False, blank=False, default="rabbits/Default.png")
+	image = models.ImageField(upload_to='rabbits/', null=False, blank=False, default="rabbits/Default.png") # change to refence to image
 	buck = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='fathered')
 	doe = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='litters')
 	note = models.TextField(blank=True, null=True)
