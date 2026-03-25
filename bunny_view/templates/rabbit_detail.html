@@ -16,6 +16,11 @@
       .bb-actions { margin-left: auto; }
       .bb-main { display:flex; gap:1.5rem; align-items:flex-start; margin-top:0.5rem; flex-wrap:wrap; }
       .bb-info { flex:1 1 280px; min-width:220px; }
+      .bb-edit-form { display:none; }
+      .bb-edit-form.is-active { display:block; }
+      .bb-display-info.is-hidden { display:none; }
+      .bb-edit-actions { display:flex; gap:0.5rem; margin-top:0.75rem; }
+      .bb-edit-actions .btn:last-child { margin-left:auto; }
       .bb-image {width:100%; height:auto; border-radius:4px; object-fit:cover; }
       .bb-info p { margin-bottom: .35rem; }
       .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
@@ -27,98 +32,283 @@
         .bb-image { max-width: 100%; }
       }
     </style>
-    <form method="post" action="{% url 'bunny_view:rabbit_delete' rabbit.id %}" enctype="multipart/form-data">
+    <form id="bb-delete-form" method="post" action="{% url 'bunny_view:rabbit_delete' rabbit.id %}" enctype="multipart/form-data">
       {% csrf_token %}
-      <div class="bb-header">
-        <a href="{{request.session.previous_page}}">Back</a>
-        <h1 class="bb-title">{{ rabbit.name }}</h1>
-        <button type="button" class="btn btn-primary btn-sm bb-actions" onclick="open_bb_modal()">Edit</button>
-        <button type="submit" class="btn btn-danger btn-sm" >Delete</button>
-      </div>
-      <hr />
-      <div class="bb-main">
-        <div class="bb-info">
-          <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
-          <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
-          <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
-          <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
+    </form>
+    <div class="bb-header">
+      <a class="btn btnPrimary btn-sm" href="{{request.session.previous_page}}">Back</a>
+      <h1 class="bb-title">{{ rabbit.name }}</h1>
+      <button type="submit" form="bb-delete-form" class="btn btn-danger btn-sm ms-auto">Delete</button>
+    </div>
+    <hr />
+    <div class="bb-main">
+      <div class="bb-info">
+          <div id="bb-display-info" class="bb-display-info">
+            <button id="bb-edit-toggle" type="button" class="btn btnPrimary btn-sm bb-actions float-end" onclick="toggleInlineEdit(true)">Edit</button>
+            <p><strong>Breed:</strong> {{ rabbit.breed|default:"Unknown" }}</p>
+            <p><strong>Sex:</strong> {{ rabbit.get_sex_display }}</p>
+            <p><strong>Date of birth:</strong> {{ rabbit.date_of_birth|date:"F j, Y"|default:"Unknown" }}</p>
+            <p><strong>Created:</strong> {{ rabbit.created|date:"F j, Y, P" }}</p>
 
-          <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
-          {% if rabbit.dead %}
-            <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
-            <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
-          {% endif %}
-
-          <p><strong>Buck:</strong>
-            {% if buck %}
-              <a href="{% url 'bunny_view:rabbit_detail' buck.id %}">{{ buck }}</a>
-            {% else %}
-              None
+            <p><strong>Status:</strong> {% if rabbit.dead %}Deceased{% else %}Alive{% endif %}</p>
+            {% if rabbit.dead %}
+              <p><strong>Date of death:</strong> {{ rabbit.date_of_death|date:"F j, Y"|default:"Unknown" }}</p>
+              <p><strong>Reason for death:</strong> {{ rabbit.cause_of_death|default:"Not recorded" }}</p>
             {% endif %}
-          </p>
 
-          <p><strong>Doe:</strong>
-            {% if doe %}
-              <a href="{% url 'bunny_view:rabbit_detail' doe.id %}">{{ doe }}</a>
+            <p><strong>Buck:</strong>
+              {% if buck %}
+                <a href="{% url 'bunny_view:rabbit_detail' buck.id %}">{{ buck }}</a>
+              {% else %}
+                None
+              {% endif %}
+            </p>
+
+            <p><strong>Doe:</strong>
+              {% if doe %}
+                <a href="{% url 'bunny_view:rabbit_detail' doe.id %}">{{ doe }}</a>
+              {% else %}
+                None
+              {% endif %}
+            </p>
+
+            <p><strong>Children:</strong></p>
+            {% if litters %}
+              {% regroup litters by litter_number as litter_groups %}
+              {% for group in litter_groups %}
+                <div class="litter-group">
+                  <p style="text-align: center;"><strong>Litter {{ group.grouper }}</strong></p>
+                  <div class="litter-bunnies">
+                    {% for c in group.list %}
+                      <a href="{% url 'bunny_view:rabbit_detail' c.rabbit.id %}">{{ c.rabbit.name }}</a>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
             {% else %}
-              None
+              <ul>
+                <li>None</li>
+              </ul>
             {% endif %}
-          </p>
+          </div>
 
-          <p><strong>Children:</strong></p>
-          {% if litters %}
-            {% regroup litters by litter_number as litter_groups %}
-            {% for group in litter_groups %}
-              <div class="litter-group">
-                <p style="text-align: center;"><strong>Litter {{ group.grouper }}</strong></p>
-                <div class="litter-bunnies">
-                  {% for c in group.list %}
-                    <a href="{% url 'bunny_view:rabbit_detail' c.rabbit.id %}">{{ c.rabbit.name }}</a>
-                  {% endfor %}
+          <form id="bb-edit-form" class="bb-edit-form" method="post" action="{% url 'bunny_view:rabbit_edit' rabbit.id %}" enctype="multipart/form-data" onsubmit="return validateInlineEditForm()">
+            {% csrf_token %}
+            <div id="div_add_rabbit">
+              <div class="row">
+                <label class="form-label" for="edit-name">Name</label>
+                <div class="form-input">
+                  <input id="edit-name" name="name" class="form-control" value="{{ rabbit.name }}">
                 </div>
               </div>
-            {% endfor %}
-          {% else %}
-            <ul>
-              <li>None</li>
-            </ul>
-          {% endif %}
-        </div>
-        <div class="d-block col-md-5">
-          <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
-            <div class="carousel-inner">
-              {% for image in images %}
-                <div class="carousel-item{% if image.image.url == rabbit.image.url %} active{% endif %}">
-                  {% if rabbit.dead %}
-                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image grayscale d-block w-100">
-                  {% else %}
-                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image d-block w-100">
-                  {% endif %}
+              <div class="row">
+                {% autoescape off %}
+                    {% include "widgets/multi_file_uploader.html" with widget=image_upload %}
+                {% endautoescape %}
+              </div>
+              <div class="row">
+                <label class="form-label" for="edit-breed">Breed</label>
+                <div class="form-input">
+                  <input id="edit-breed" name="breed" class="form-control" value="{{ rabbit.breed }}">
                 </div>
-              {% endfor%}
+              </div>
+              <div class="row">
+                <label class="form-label" for="edit-sex">Sex</label>
+                <div class="form-input">
+                  <select id="edit-sex" name="sex" class="form-select">
+                    <option value="M" {% if rabbit.sex == "M" %}selected{% endif %}>Buck</option>
+                    <option value="F" {% if rabbit.sex == "F" %}selected{% endif %}>Doe</option>
+                    <option value="U" {% if rabbit.sex == "U" %}selected{% endif %}>Unsexed</option>
+                  </select>
+                </div>
+              </div>
+              <div class="row">
+                <label class="form-label" for="edit-dob">Date of birth</label>
+                <div class="form-input">
+                  <input id="edit-dob" type="date" name="date_of_birth" class="form-control" value="{{ rabbit.date_of_birth|date:'Y-m-d' }}">
+                </div>
+              </div>
+              <div class="row">
+                <label for="edit-parent">Parent</label>
+                <select id="edit-parent" class="selectpicker" multiple data-width="100%">
+                  <option value="">No parents available</option>
+                  {% for p in parents %}
+                    {% if buck == p or doe == p %}
+                      <option value="{{ p.id }}" data-sex="{{ p.sex }}" selected>{{ p }}</option>
+                    {% else %}
+                      <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                <input type="hidden" id="edit-parent-ids" name="parent_ids">
+              </div>
+              <div class="accordion accordion-flush" id="accordionFlushExample">
+                <div class="accordion-item">
+                  <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                      Additional info
+                    </button>
+                  </h2>
+                  <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body">
+                      <div class="row">
+                        <label for="edit-note">Notes</label>
+                        <div class="form-input">
+                          <textarea id="edit-note" name="note">{{ rabbit.note }}</textarea>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label for="edit-temprament">Temprament</label>
+                        <div class="form-input">
+                          <input type="text" id="edit-temprament" name="temprament" value="{{ rabbit.temprament }}">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="form-check-label" for="edit-dead-check">Deceased</label>
+                        <div class="form-input">
+                          <input class="form-check-input" type="checkbox" value="on" id="edit-dead-check" name="dead" {% if rabbit.dead %}checked{% endif %}>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="form-label" for="edit-date-of-death">Date of death</label>
+                        <div class="form-input">
+                          <input id="edit-date-of-death" type="date" name="date_of_death" class="form-control" value="{{ rabbit.date_of_death|date:'Y-m-d' }}">
+                        </div>
+                      </div>
+                      <div class="row">
+                        <label class="form-label" for="edit-cause-of-death">Reason for death</label>
+                        <div class="form-input">
+                          <textarea id="edit-cause-of-death" name="cause_of_death" class="form-control" rows="3">{{ rabbit.cause_of_death }}</textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="bb-edit-actions">
+                <button type="button" class="btn btn-secondary" onclick="toggleInlineEdit(false)">Cancel</button>
+                <button type="submit" class="btn btnPrimary">Save</button>
+              </div>
             </div>
-            <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
-              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Previous</span>
-            </button>
-            <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
-              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-              <span class="visually-hidden">Next</span>
-            </button>
-            <div class="carousel_button_group">
-              <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
-              <button id="btnDefault" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="SetDefault()">Set Default</button>
-              <button id="btnDeleteImage" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="DeleteImage()">Delete Image</button>
-            </div>
+          </form>
+      </div>
+      <div class="d-block col-md-5">
+        <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            {% for image in images %}
+              <div class="carousel-item{% if image.image.url == rabbit.image.url %} active{% endif %}">
+                {% if rabbit.dead %}
+                  <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image grayscale d-block w-100">
+                {% else %}
+                  <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image d-block w-100">
+                {% endif %}
+              </div>
+            {% endfor%}
           </div>
-          
+          <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#imagesCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+          <div class="carousel_button_group">
+            <button type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="OpenCrop()">Crop</button>
+            <button id="btnDefault" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="SetDefault()">Set Default</button>
+            <button id="btnDeleteImage" type="button" class="btn btnPrimary" style="vertical-align: top;" onclick="DeleteImage()">Delete Image</button>
+          </div>
         </div>
       </div>
-    </form>
+    </div>
   </div>
 
   <script type="text/javascript">
         var currentDefaultImg = "{{ rabbit.image.url|escapejs }}";
+
+        function toggleInlineEdit(showForm) {
+          var displayInfo = document.getElementById("bb-display-info");
+          var editForm = document.getElementById("bb-edit-form");
+          var editButton = document.getElementById("bb-edit-toggle");
+          if (!displayInfo || !editForm || !editButton) {
+            return;
+          }
+
+          displayInfo.classList.toggle("is-hidden", showForm);
+          editForm.classList.toggle("is-active", showForm);
+          editButton.textContent = showForm ? "Editing" : "Edit";
+          editButton.disabled = showForm;
+
+          if (showForm) {
+            $('#edit-parent').selectpicker('render');
+            $('#edit-parent').selectpicker('refresh');
+          }
+        }
+
+        function validateInlineEditForm() {
+          var parent = $('#edit-parent').val();
+          if (parent && parent.length > 0) {
+            var parentIds = parent.map(function(id) { return parseInt(id, 10); });
+            if (parentIds.some(function(id) { return Number.isNaN(id); })) {
+              alert('Invalid parent selection.');
+              return false;
+            }
+          }
+          if (parent && parent.length > 2) {
+            alert('You can select up to 2 parents.');
+            return false;
+          }
+
+          if (parent && parent.length > 1) {
+            var buckCount = $('#edit-parent option:selected').filter(function() {
+              return $(this).data('sex') === 'M';
+            }).length;
+            if (buckCount > 1) {
+              alert('Only one Buck may be selected.');
+              return false;
+            }
+
+            var doeCount = $('#edit-parent option:selected').filter(function() {
+              return $(this).data('sex') === 'F';
+            }).length;
+            if (doeCount > 1) {
+              alert('Only one Doe may be selected.');
+              return false;
+            }
+          }
+
+          var parentIds = parent ? parent.map(function(id) { return parseInt(id, 10); }) : [];
+          $('#edit-parent-ids').val(parentIds.join(','));
+
+          var breed = $('#edit-breed').val().trim();
+          if (breed && breed.length > 100) {
+            alert('Breed must be less than 100 characters.');
+            return false;
+          }
+          if (breed && /[^a-zA-Z\s]/.test(breed)) {
+            alert('Breed can only contain letters and spaces.');
+            return false;
+          }
+
+          var dob = $('#edit-dob').val();
+          if (dob) {
+            var dobDate = new Date(dob);
+            var today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (dobDate > today) {
+              alert('Date of birth cannot be in the future.');
+              return false;
+            }
+          }
+
+          var sex = $('#edit-sex').val();
+          if (!['M', 'F', 'U'].includes(sex)) {
+            alert('Please select a valid sex.');
+            return false;
+          }
+
+          return true;
+        }
 
         function updateImageActionButtons() {
           var activeImage = document.querySelector(".carousel-inner .active img");
@@ -209,106 +399,4 @@
 
 {% endblock %}
 
-{% block modal %}
-  <form method="post" action="{% url 'bunny_view:rabbit_edit' rabbit.id %}" enctype="multipart/form-data">
-    {% csrf_token %}
-    <div id="div_add_rabbit">
-      <div class="row">
-        <label class="form-label">Name</label>
-        <div class="form-input"> 
-          <input name="name" class="form-control" value="{{ rabbit.name }}">
-        </div>
-      </div>
-      <div class="row">
-        <label class="form-label">Image</label>
-        <div class="form-input">
-          <input type="file" name="image" class="form-control">
-          <div class="form-text">Current: {{ rabbit.image.name|default:"No image" }}</div>
-        </div>
-      </div>
-      <div class="row">
-        <label class="form-label">Breed</label>
-        <div class="form-input">
-          <input name="breed" class="form-control" value="{{ rabbit.breed }}">
-        </div>
-      </div>
-      <div class="row">
-        <label class="form-label">Sex</label>
-        <div class="form-input">
-          <select name="sex" class="form-select">
-            <option value="M" {% if rabbit.sex == "M" %}selected{% endif %}>Buck</option>
-            <option value="F" {% if rabbit.sex == "F" %}selected{% endif %}>Doe</option>
-            <option value="U" {% if rabbit.sex == "U" %}selected{% endif %}>Unsexed</option>
-          </select>
-        </div>
-      </div>
-      <div class="row">
-        <label class="form-label">Date of birth</label>
-        <div class="form-input">
-          <input type="date" name="date_of_birth" class="form-control" value="{{ rabbit.date_of_birth|date:'Y-m-d' }}">
-        </div>
-      </div>
-      <div class="row">
-        <label for="id_parent">Parent</label>
-        <select id="parent" class="selectpicker" multiple>
-            <option value="">No parents available</option>
-            {% for p in parents %}
-              {% if buck == p or doe == p %}
-                <option value="{{ p.id }}" data-sex="{{ p.sex }}" selected>{{ p }}</option>
-              {% else %}
-                  <option value="{{ p.id }}" data-sex="{{ p.sex }}">{{ p }}</option>
-              {% endif %}
-            {% endfor %}
-        </select>
-        <input type="hidden" id="parent_ids" name="parent_ids">
-      </div>
-      <div class="accordion accordion-flush" id="accordionFlushExample">
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="flush-headingOne">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                Additional info
-            </button>
-            </h2>
-            <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                <div class="accordion-body">
-                    <div class="row">
-                        <label for="id_note">Notes</label>
-                        <div class="form-input">
-                            <textarea type="text"  id="note" name="note">{{ rabbit.note }}</textarea>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <label for="id_temprament">Temprament</label>
-                        <div class="form-input">
-                            <input type="text" id="temprament" name="temprament" value="{{ rabbit.temprament }}">
-                        </div>
-                    </div>
-                    <div class="row">
-                      <label class="form-check-label" for="deadCheck">Deceased</label>
-                      <div class="form-input">
-                          <input class="form-check-input" type="checkbox" value="on" id="deadCheck" name="dead" {% if rabbit.dead %}checked{% endif %}>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <label class="form-label">Date of death</label>
-                      <div class="form-input">
-                        <input type="date" name="date_of_death" class="form-control" value="{{ rabbit.date_of_death|date:'Y-m-d' }}">
-                      </div>
-                    </div>
-                    <div class="row">
-                      <label class="form-label">Reason for death</label>
-                      <div class="form-input">
-                        <textarea name="cause_of_death" class="form-control" rows="3">{{ rabbit.cause_of_death }}</textarea>  
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-      </div>
-      <div class="col-md-12" style="margin-top:0.75rem; display:flex; gap:0.5rem;">
-        <button type="submit" class="btn btnPrimary me-0 ms-auto" onclick="modal_verify()">Save</button> <!-- add js verification -->
-      </div>
-    </div>
-  </form>
-
-{% endblock %}
+{% block modal %}{% endblock %}
