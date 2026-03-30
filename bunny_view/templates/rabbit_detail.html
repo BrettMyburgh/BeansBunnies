@@ -191,6 +191,76 @@
               </div>
             </div>
           </form>
+          {% if kit %}
+            <form id="bunnyAbandoned" method="post" action="{% url 'bunny_view:rabbit_abandon' rabbit.id %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form_details">
+                <div class="row">
+                  <label class="form-label" for="chkAbandoned">Abandoned</label>
+                  <div class="form-input">
+                    <input type="checkbox" id="chkAbandoned" class="form-check-input" name="abandoned" {% if rabbit.abandoned %}checked{% endif %} onchange="abandonedChanged()">
+                  </div>
+                </div>
+              </div>
+              <div id="divAbandonDetails" class="form_details" style="display:none;">
+                <div class="row">
+                  <label class="form-label" for="txtAbandonReason">Reason for abandonment</label>
+                  <div class="form-input">
+                    <input type="text" id="txtAbandonReason" class="form-control" name="abandon_reason" value="{{ abandon_details.abandon_reason }}">
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="form-label" for="txtAbandonDate">Date of abandonment</label>
+                  <div class="form-input">
+                    <input type="date" id="txtAbandonDate" class="form-control" name="abandon_date" value="{{ abandon_details.abandon_date|date:'Y-m-d' }}">
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="form-label" for="chkFostered">Is fostered</label>
+                  <div class="form-input">
+                    <input type="checkbox" id="chkFostered" class="form-check-input" name="fostered" {% if abandon_details.fostered %}checked{% endif %} onchange="fosterChanged()">
+                  </div>
+                </div>
+                <div id="divFosterMom" class="row" style="display: none;">
+                  <label class="form-label" for="selectFosterMom">Foster mom</label>
+                  <!-- <div class="form-input"> -->
+                    <select id="selectFosterMom" name="foster_mom" class="selectpicker col-md-9">
+                      <option value="">Select foster mom</option>
+                      {% for foster in fosters %}
+                        <option value="{{ foster.id }}" {% if abandon_details.foster_mom and abandon_details.foster_mom.id == foster.id %}selected{% endif %}>{{ foster.name }}</option>
+                      {% endfor %}
+                    </select>
+                  <!-- </div> -->
+                </div>
+                <div id="btnSave" class="" style="display: none;">
+                  <button type="submit" class="btn btnPrimary float-end">Update</button>
+                </div>
+              </div>
+            </form>
+            <form id="rabbitWeight" method="post" action="{% url 'bunny_view:rabbit_weight' rabbit.id %}" enctype="multipart/form-data" onsubmit="return doAjaxPost(this)">
+              {% csrf_token %}
+              <div class="form_details">
+                <table>
+                  <tr>
+                    <th class="tblDate">Date</th>
+                    <th class="tblWeight">Weight (grams)</th>
+                    <th class="tblDelete">Delete</th>
+                    </tr>
+                  {% for weight in weights %}
+                    <tr>
+                      <td>{{ weight.date|date:"Y-m-d" }}</td>
+                      <td>{{ weight.weight }}</td>
+                      <td></td>
+                    </tr>
+                  {% endfor %}
+                </table>
+                <div class="d-flex">
+                  <button type="button" class="btn btnPrimary" style="margin-top: 0.5rem;" onclick="AddWeight()">Add Weight</button>
+                  <button id="btnWeightSave" type="submit" class="btn btnPrimary ms-auto" style="margin-top: 0.5rem; display:none;">Save Weight</button>
+                </div>
+              </div>
+            </form>
+          {% endif %}
       </div>
       <div class="d-block col-md-5">
         <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
@@ -391,9 +461,110 @@
         
         document.addEventListener("DOMContentLoaded",function(){
           updateImageActionButtons();
+          var bunnyAbandonedForm = document.getElementById("bunnyAbandoned");
+          if (bunnyAbandonedForm) {
+            var formElements = bunnyAbandonedForm.querySelectorAll("input, select, textarea");
+            formElements.forEach(function(element) {
+              element.addEventListener("change", showBtnSave);
+            });
+          }
         });
 
+        function abandonedChanged(){
+          abdandonDetails = document.getElementById("divAbandonDetails");
+          if(document.getElementById("chkAbandoned").checked){
+            abdandonDetails.style.display = "block";
+            if ("{{ abandon_details.date_of_abandonment }}" == "") {
+              document.getElementById("txtAbandonDate").value = new Date().toISOString().split('T')[0];
+            }
+          } else {
+            abdandonDetails.style.display = "none";
+          }
+        }
 
+        function fosterChanged(){
+          var fosterSelect = document.getElementById("divFosterMom");
+          if(document.getElementById("chkFostered").checked){
+            fosterSelect.style.display = "flex";
+          } else {
+            fosterSelect.style.display = "none";
+          }
+        }
+
+        function showBtnSave(){
+          var btnSave = document.getElementById("btnSave");
+          if (btnSave) {
+            btnSave.style.display = "block";
+          }
+        }
+
+        function hideBtnSave(){
+          var btnSave = document.getElementById("btnSave");
+          if (btnSave) {
+            btnSave.style.display = "none";
+          }
+        }
+
+        function ShowBtn(id){
+          var btnSave = document.getElementById(id);
+          if (btnSave) {
+            btnSave.style.display = "block";
+          }
+        }
+
+        function HideBtn(id){
+          var btnSave = document.getElementById(id);
+          if (btnSave) {
+            btnSave.style.display = "none";
+          }
+        }
+
+        function AddWeight(){
+          var table = document.querySelector("#rabbitWeight table");
+          var newRow = table.insertRow(-1);
+          var dateCell = newRow.insertCell(0);
+          var weightCell = newRow.insertCell(1);
+          var deleteCell = newRow.insertCell(2);
+          var currentDate = new Date().toISOString().split('T')[0];
+          dateCell.innerHTML = '<input id="new_weight_date_' + newRow.rowIndex + '" type="date" name="weight_date_' + newRow.rowIndex + '" class="form-control" value="' + currentDate + '">';
+          weightCell.innerHTML = '<input id="new_weight_value_' + newRow.rowIndex + '" type="number" name="weight_value_' + newRow.rowIndex + '" class="form-control" step="0.01">';
+          deleteCell.innerHTML = '<button type="button" class="btn btn-close" onclick="DeleteWeight(this)"></button>';
+          ShowBtn("btnWeightSave");
+        }
+        
+        function DeleteWeight(button){
+          var row = button.closest("tr");
+          var table = document.querySelector("#rabbitWeight table");
+          
+          if (row) {
+            row.remove();
+            
+            // Only show button if new rows with inputs exist
+            var hasNewWeights = table.querySelector("input") !== null;
+            if (hasNewWeights) {
+              ShowBtn("btnWeightSave");
+            } else {
+              HideBtn("btnWeightSave");
+            }
+          }
+        }
+
+        function doAjaxPost(form){
+          debugger;
+          var formData = new FormData(form);
+          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
+          formData.append("csrfmiddlewaretoken", csrftoken);
+          $.post(form.action, formData).done(function(data){
+            if(data.button){
+              HideBtn(data.button);
+            }
+            if (data.messages){
+              data.messages.forEach(function(msg){
+                addMessage(msg.tags, msg.message);
+              });
+            }
+          });
+        }
 
   </script>
 

@@ -22,6 +22,7 @@ class Rabbit(models.Model):
 	dead = models.BooleanField(default=False)
 	date_of_death = models.DateField(null=True, blank=True)
 	cause_of_death = models.TextField(blank=True)
+	abandoned = models.BooleanField(default=False)
 
 	def __str__(self):
 		return self.name or f'Rabbit {self.pk}'
@@ -39,6 +40,26 @@ class RabbitLitter(models.Model):
 	doe = models.ForeignKey(Rabbit, on_delete=models.CASCADE, null=True, blank=True, related_name='litter_doe')
 	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE)
 	litter_date = models.DateField(null=True, blank=True)
+	abandoned = models.BooleanField(default=False)
 
-# 	def __int__(self):
-# 		return self.litter_id or f'Litter {self.pk}'
+	def __int__(self):
+		return self.litter_id or f'Litter {self.pk}'
+	
+class RabbitAbandoned(models.Model):
+	abandon_id = models.AutoField(primary_key=True)
+	rabbit = models.OneToOneField(Rabbit, on_delete=models.CASCADE, related_name='abandonment_details')
+	reason = models.TextField(blank=True)
+	date = models.DateField(null=True, blank=True)
+	foster_mom = models.ForeignKey(Rabbit, on_delete=models.SET_NULL, null=True, blank=True, related_name='fostered_kits')
+
+	def __int__(self):
+		return self.abandon_id or f'Abandonment {self.pk}'
+
+class RabbitWeight(models.Model):
+	weight_id = models.AutoField(primary_key=True)
+	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='weights')
+	weight = models.DecimalField(max_digits=5, decimal_places=2)
+	date = models.DateField()
+
+	def __int__(self):
+		return self.weight_id or f'Weight {self.pk}'

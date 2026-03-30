@@ -5,10 +5,10 @@ import uuid
 from django.core.files.base import ContentFile
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from datetime import date
+from datetime import date, timedelta
 from django.http import HttpResponseRedirect, JsonResponse
 
-from db.models import Rabbit, RabbitImage, RabbitLitter
+from db.models import Rabbit, RabbitAbandoned, RabbitImage, RabbitLitter, RabbitWeight
 
 # Create your views here.
 def rabbit_detail(request, pk):
@@ -24,13 +24,33 @@ def rabbit_detail(request, pk):
     buck = rabbit.buck
     doe = rabbit.doe
 
+    is_kit = rabbit.date_of_birth and rabbit.date_of_birth >= date.today() - timedelta(days=8*7)
+    fosters = Rabbit.objects.filter(sex='F', dead=False)
+    abandon_details = None
+    if rabbit.abandoned:
+        try:
+            abandon_details = rabbit.abandonment_details
+        except RabbitAbandoned.DoesNotExist:
+            abandon_details = None
+
+    weights = RabbitWeight.objects.filter(rabbit_id=rabbit)
     file_uploader = {
         "widget_id":    "myUpload",
         "label":        "Add Images",
         "hidden_name":  "attachments",
         "hidden_value": "[]",
     }
-    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 'buck': buck, 'doe': doe, 'parents': parents, 'litters':litters, 'images':images, 'image_upload': file_uploader})
+    return render(request, 'rabbit_detail.html', {'rabbit': rabbit, 
+                                                  'buck': buck, 
+                                                  'doe': doe, 
+                                                  'parents': parents, 
+                                                  'litters':litters, 
+                                                  'images':images, 
+                                                  'image_upload': file_uploader, 
+                                                  'kit': is_kit, 
+                                                  'fosters': fosters, 
+                                                  'abandon_details': abandon_details,
+                                                  'weights': weights})
 
 
 def rabbit_edit(request, pk):
@@ -170,3 +190,78 @@ def rabbit_image_delete(request, pk):
     image = get_object_or_404(RabbitImage,image_id=image_id)
     image.delete()
     return JsonResponse({'rabbit_image': image_id})
+
+def rabbit_abandon(request, pk):
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    is_abandoned = bool(request.POST.get('abandoned'))
+    abandon_reason = request.POST.get('reason', '')
+    abandon_date_str = request.POST.get('date')
+    foster_mom_id = request.POST.get('foster_mom')
+    foster_mom = None
+    if foster_mom_id and foster_mom_id.isdigit():
+        try:
+            foster_mom = Rabbit.objects.get(pk=foster_mom_id)
+        except Rabbit.DoesNotExist:
+            foster_mom = None
+    abandoned_db = RabbitAbandoned.objects.filter(rabbit=rabbit).first()
+    if rabbit.abandoned:
+        if is_abandoned:
+            if abandoned_db:
+                abandoned_db.reason = abandon_reason
+                abandoned_db.date = abandon_date_str
+                abandoned_db.foster_mom = foster_mom
+                abandoned_db.save()
+            else:
+                RabbitAbandoned.objects.create(
+                    rabbit=rabbit,
+                    reason=abandon_reason,
+                    date=abandon_date_str,
+                    foster_mom=foster_mom
+                )
+        else:
+            rabbit.abandoned = False
+            rabbit.save()
+            if abandoned_db:
+                abandoned_db.delete()
+    else:
+        if is_abandoned:
+            if abandoned_db:
+                abandoned_db.reason = abandon_reason
+                abandoned_db.date = abandon_date_str
+                abandoned_db.foster_mom = foster_mom
+                abandoned_db.save()
+            else:
+                RabbitAbandoned.objects.create(
+                    rabbit=rabbit,
+                    reason=abandon_reason,
+                    date=abandon_date_str,
+                    foster_mom=foster_mom
+                )
+        else:
+            if abandoned_db:
+                abandoned_db.delete()
+    messages.success(request, 'Updated abandonment status for rabbit: {}'.format(rabbit))
+    return JsonResponse({'status': 'success'})
+
+def rabbit_weight(request, pk):
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    weights = [v for k, v in request.POST.items() if k.startswith('weight_value_')]
+    date_strs = [v for k, v in request.POST.items() if k.startswith('weight_date_')]
+    messages= []
+    for weight, date_str in zip(weights, date_strs):
+        date_of_weight = None
+        if date_str:
+            try:
+                date_of_weight = date.fromisoformat(date_str)
+            except Exception:
+                date_of_weight = None
+        if weight and date_of_weight:
+            RabbitWeight.objects.create(
+                rabbit=rabbit,
+                weight=weight,
+                date=date_of_weight
+            )
+            messages.append({'tags': 'success', 'message': 'Added weight for rabbit: {}'.format(rabbit)})
+        else:
+            messages.append({'tags': 'error', 'message': 'Invalid weight or date. Please try again.'})
+    return JsonResponse({'type': 'success', 'messages': messages, 'button': 'btnWeightSave'})

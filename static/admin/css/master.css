@@ -1183,7 +1183,7 @@ progress {
     flex: 0 0 auto;
     width: 16.66666667%;
   }
-  .col-md-3, #div_add_rabbit label {
+  .col-md-3, #div_add_rabbit label, .form_details label {
     flex: 0 0 auto;
     width: 25%;
   }
@@ -1191,7 +1191,7 @@ progress {
     flex: 0 0 auto;
     width: 33.33333333%;
   }
-  .col-md-5 {
+  .col-md-5, .form_details table .tblDate, .form_details table .tblWeight {
     flex: 0 0 auto;
     width: 41.66666667%;
   }
@@ -1207,7 +1207,7 @@ progress {
     flex: 0 0 auto;
     width: 66.66666667%;
   }
-  .col-md-9, #div_add_rabbit .form-input, #div_add_rabbit .dropdown {
+  .col-md-9, #div_add_rabbit .form-input, #div_add_rabbit .dropdown, .form_details .form-input, .form_details .dropdown {
     flex: 0 0 auto;
     width: 75%;
   }
@@ -1918,7 +1918,7 @@ progress {
     -webkit-overflow-scrolling: touch;
   }
 }
-.form-label, #div_add_rabbit label {
+.form-label, #div_add_rabbit label, .form_details label {
   margin-bottom: 0.5rem;
 }
 
@@ -1948,7 +1948,7 @@ progress {
   color: #6c757d;
 }
 
-.form-control, #div_add_rabbit input:not(.form-check-input), #div_add_rabbit textarea {
+.form-control, #div_add_rabbit input:not(.form-check-input), #div_add_rabbit textarea, .form_details input:not(.form-check-input), .form_details textarea {
   display: block;
   width: 100%;
   padding: 0.375rem 0.75rem;
@@ -1964,35 +1964,35 @@ progress {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .form-control, #div_add_rabbit input:not(.form-check-input), #div_add_rabbit textarea {
+  .form-control, #div_add_rabbit input:not(.form-check-input), #div_add_rabbit textarea, .form_details input:not(.form-check-input), .form_details textarea {
     transition: none;
   }
 }
-.form-control[type=file], #div_add_rabbit input[type=file]:not(.form-check-input), #div_add_rabbit textarea[type=file] {
+.form-control[type=file], #div_add_rabbit input[type=file]:not(.form-check-input), #div_add_rabbit textarea[type=file], .form_details input[type=file]:not(.form-check-input), .form_details textarea[type=file] {
   overflow: hidden;
 }
-.form-control[type=file]:not(:disabled):not([readonly]), #div_add_rabbit input[type=file]:not(:disabled):not([readonly]):not(.form-check-input), #div_add_rabbit textarea[type=file]:not(:disabled):not([readonly]) {
+.form-control[type=file]:not(:disabled):not([readonly]), #div_add_rabbit input[type=file]:not(:disabled):not([readonly]):not(.form-check-input), #div_add_rabbit textarea[type=file]:not(:disabled):not([readonly]), .form_details input[type=file]:not(:disabled):not([readonly]):not(.form-check-input), .form_details textarea[type=file]:not(:disabled):not([readonly]) {
   cursor: pointer;
 }
-.form-control:focus, #div_add_rabbit input:focus:not(.form-check-input), #div_add_rabbit textarea:focus {
+.form-control:focus, #div_add_rabbit input:focus:not(.form-check-input), #div_add_rabbit textarea:focus, .form_details input:focus:not(.form-check-input), .form_details textarea:focus {
   color: #212529;
   background-color: #fff;
   border-color: rgb(215, 184.5, 156);
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgba(175, 114, 57, 0.25);
 }
-.form-control::-webkit-date-and-time-value, #div_add_rabbit input:not(.form-check-input)::-webkit-date-and-time-value, #div_add_rabbit textarea::-webkit-date-and-time-value {
+.form-control::-webkit-date-and-time-value, #div_add_rabbit input:not(.form-check-input)::-webkit-date-and-time-value, #div_add_rabbit textarea::-webkit-date-and-time-value, .form_details input:not(.form-check-input)::-webkit-date-and-time-value, .form_details textarea::-webkit-date-and-time-value {
   height: 1.5em;
 }
-.form-control::placeholder, #div_add_rabbit input:not(.form-check-input)::placeholder, #div_add_rabbit textarea::placeholder {
+.form-control::placeholder, #div_add_rabbit input:not(.form-check-input)::placeholder, #div_add_rabbit textarea::placeholder, .form_details input:not(.form-check-input)::placeholder, .form_details textarea::placeholder {
   color: #6c757d;
   opacity: 1;
 }
-.form-control:disabled, #div_add_rabbit input:disabled:not(.form-check-input), #div_add_rabbit textarea:disabled, .form-control[readonly], #div_add_rabbit input[readonly]:not(.form-check-input), #div_add_rabbit textarea[readonly] {
+.form-control:disabled, #div_add_rabbit input:disabled:not(.form-check-input), #div_add_rabbit textarea:disabled, .form_details input:disabled:not(.form-check-input), .form_details textarea:disabled, .form-control[readonly], #div_add_rabbit input[readonly]:not(.form-check-input), #div_add_rabbit textarea[readonly], .form_details input[readonly]:not(.form-check-input), .form_details textarea[readonly] {
   background-color: #e9ecef;
   opacity: 1;
 }
-.form-control::file-selector-button, #div_add_rabbit input:not(.form-check-input)::file-selector-button, #div_add_rabbit textarea::file-selector-button {
+.form-control::file-selector-button, #div_add_rabbit input:not(.form-check-input)::file-selector-button, #div_add_rabbit textarea::file-selector-button, .form_details input:not(.form-check-input)::file-selector-button, .form_details textarea::file-selector-button {
   padding: 0.375rem 0.75rem;
   margin: -0.375rem -0.75rem;
   margin-inline-end: 0.75rem;
@@ -2007,14 +2007,14 @@ progress {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .form-control::file-selector-button, #div_add_rabbit input:not(.form-check-input)::file-selector-button, #div_add_rabbit textarea::file-selector-button {
+  .form-control::file-selector-button, #div_add_rabbit input:not(.form-check-input)::file-selector-button, #div_add_rabbit textarea::file-selector-button, .form_details input:not(.form-check-input)::file-selector-button, .form_details textarea::file-selector-button {
     transition: none;
   }
 }
-.form-control:hover:not(:disabled):not([readonly])::file-selector-button, #div_add_rabbit input:hover:not(:disabled):not([readonly]):not(.form-check-input)::file-selector-button, #div_add_rabbit textarea:hover:not(:disabled):not([readonly])::file-selector-button {
+.form-control:hover:not(:disabled):not([readonly])::file-selector-button, #div_add_rabbit input:hover:not(:disabled):not([readonly]):not(.form-check-input)::file-selector-button, #div_add_rabbit textarea:hover:not(:disabled):not([readonly])::file-selector-button, .form_details input:hover:not(:disabled):not([readonly]):not(.form-check-input)::file-selector-button, .form_details textarea:hover:not(:disabled):not([readonly])::file-selector-button {
   background-color: rgb(221.35, 224.2, 227.05);
 }
-.form-control::-webkit-file-upload-button, #div_add_rabbit input:not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea::-webkit-file-upload-button {
+.form-control::-webkit-file-upload-button, #div_add_rabbit input:not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea::-webkit-file-upload-button, .form_details input:not(.form-check-input)::-webkit-file-upload-button, .form_details textarea::-webkit-file-upload-button {
   padding: 0.375rem 0.75rem;
   margin: -0.375rem -0.75rem;
   margin-inline-end: 0.75rem;
@@ -2029,11 +2029,11 @@ progress {
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 @media (prefers-reduced-motion: reduce) {
-  .form-control::-webkit-file-upload-button, #div_add_rabbit input:not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea::-webkit-file-upload-button {
+  .form-control::-webkit-file-upload-button, #div_add_rabbit input:not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea::-webkit-file-upload-button, .form_details input:not(.form-check-input)::-webkit-file-upload-button, .form_details textarea::-webkit-file-upload-button {
     transition: none;
   }
 }
-.form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button, #div_add_rabbit input:hover:not(:disabled):not([readonly]):not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
+.form-control:hover:not(:disabled):not([readonly])::-webkit-file-upload-button, #div_add_rabbit input:hover:not(:disabled):not([readonly]):not(.form-check-input)::-webkit-file-upload-button, #div_add_rabbit textarea:hover:not(:disabled):not([readonly])::-webkit-file-upload-button, .form_details input:hover:not(:disabled):not([readonly]):not(.form-check-input)::-webkit-file-upload-button, .form_details textarea:hover:not(:disabled):not([readonly])::-webkit-file-upload-button {
   background-color: rgb(221.35, 224.2, 227.05);
 }
 
@@ -2087,7 +2087,7 @@ progress {
   margin-inline-end: 1rem;
 }
 
-textarea.form-control, #div_add_rabbit textarea {
+textarea.form-control, #div_add_rabbit textarea, .form_details textarea {
   min-height: calc(1.5em + (0.75rem + 2px));
 }
 textarea.form-control-sm {
@@ -2362,7 +2362,7 @@ textarea.form-control-lg {
 .form-floating {
   position: relative;
 }
-.form-floating > .form-control, #div_add_rabbit .form-floating > input:not(.form-check-input), #div_add_rabbit .form-floating > textarea,
+.form-floating > .form-control, #div_add_rabbit .form-floating > input:not(.form-check-input), #div_add_rabbit .form-floating > textarea, .form_details .form-floating > input:not(.form-check-input), .form_details .form-floating > textarea,
 .form-floating > .form-select {
   height: calc(3.5rem + 2px);
   line-height: 1.25;
@@ -2383,17 +2383,17 @@ textarea.form-control-lg {
     transition: none;
   }
 }
-.form-floating > .form-control, #div_add_rabbit .form-floating > input:not(.form-check-input), #div_add_rabbit .form-floating > textarea {
+.form-floating > .form-control, #div_add_rabbit .form-floating > input:not(.form-check-input), #div_add_rabbit .form-floating > textarea, .form_details .form-floating > input:not(.form-check-input), .form_details .form-floating > textarea {
   padding: 1rem 0.75rem;
 }
-.form-floating > .form-control::placeholder, #div_add_rabbit .form-floating > input:not(.form-check-input)::placeholder, #div_add_rabbit .form-floating > textarea::placeholder {
+.form-floating > .form-control::placeholder, #div_add_rabbit .form-floating > input:not(.form-check-input)::placeholder, #div_add_rabbit .form-floating > textarea::placeholder, .form_details .form-floating > input:not(.form-check-input)::placeholder, .form_details .form-floating > textarea::placeholder {
   color: transparent;
 }
-.form-floating > .form-control:focus, #div_add_rabbit .form-floating > input:focus:not(.form-check-input), #div_add_rabbit .form-floating > textarea:focus, .form-floating > .form-control:not(:placeholder-shown), #div_add_rabbit .form-floating > input:not(:placeholder-shown):not(.form-check-input), #div_add_rabbit .form-floating > textarea:not(:placeholder-shown) {
+.form-floating > .form-control:focus, #div_add_rabbit .form-floating > input:focus:not(.form-check-input), #div_add_rabbit .form-floating > textarea:focus, .form_details .form-floating > input:focus:not(.form-check-input), .form_details .form-floating > textarea:focus, .form-floating > .form-control:not(:placeholder-shown), #div_add_rabbit .form-floating > input:not(:placeholder-shown):not(.form-check-input), #div_add_rabbit .form-floating > textarea:not(:placeholder-shown), .form_details .form-floating > input:not(:placeholder-shown):not(.form-check-input), .form_details .form-floating > textarea:not(:placeholder-shown) {
   padding-top: 1.625rem;
   padding-bottom: 0.625rem;
 }
-.form-floating > .form-control:-webkit-autofill, #div_add_rabbit .form-floating > input:-webkit-autofill:not(.form-check-input), #div_add_rabbit .form-floating > textarea:-webkit-autofill {
+.form-floating > .form-control:-webkit-autofill, #div_add_rabbit .form-floating > input:-webkit-autofill:not(.form-check-input), #div_add_rabbit .form-floating > textarea:-webkit-autofill, .form_details .form-floating > input:-webkit-autofill:not(.form-check-input), .form_details .form-floating > textarea:-webkit-autofill {
   padding-top: 1.625rem;
   padding-bottom: 0.625rem;
 }
@@ -2401,15 +2401,17 @@ textarea.form-control-lg {
   padding-top: 1.625rem;
   padding-bottom: 0.625rem;
 }
-.form-floating > .form-control:focus ~ label, #div_add_rabbit .form-floating > input:focus:not(.form-check-input) ~ label, #div_add_rabbit .form-floating > textarea:focus ~ label,
+.form-floating > .form-control:focus ~ label, #div_add_rabbit .form-floating > input:focus:not(.form-check-input) ~ label, #div_add_rabbit .form-floating > textarea:focus ~ label, .form_details .form-floating > input:focus:not(.form-check-input) ~ label, .form_details .form-floating > textarea:focus ~ label,
 .form-floating > .form-control:not(:placeholder-shown) ~ label,
 #div_add_rabbit .form-floating > input:not(:placeholder-shown):not(.form-check-input) ~ label,
 #div_add_rabbit .form-floating > textarea:not(:placeholder-shown) ~ label,
+.form_details .form-floating > input:not(:placeholder-shown):not(.form-check-input) ~ label,
+.form_details .form-floating > textarea:not(:placeholder-shown) ~ label,
 .form-floating > .form-select ~ label {
   opacity: 0.65;
   transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
 }
-.form-floating > .form-control:-webkit-autofill ~ label, #div_add_rabbit .form-floating > input:-webkit-autofill:not(.form-check-input) ~ label, #div_add_rabbit .form-floating > textarea:-webkit-autofill ~ label {
+.form-floating > .form-control:-webkit-autofill ~ label, #div_add_rabbit .form-floating > input:-webkit-autofill:not(.form-check-input) ~ label, #div_add_rabbit .form-floating > textarea:-webkit-autofill ~ label, .form_details .form-floating > input:-webkit-autofill:not(.form-check-input) ~ label, .form_details .form-floating > textarea:-webkit-autofill ~ label {
   opacity: 0.65;
   transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
 }
@@ -2421,14 +2423,14 @@ textarea.form-control-lg {
   align-items: stretch;
   width: 100%;
 }
-.input-group > .form-control, #div_add_rabbit .input-group > input:not(.form-check-input), #div_add_rabbit .input-group > textarea,
+.input-group > .form-control, #div_add_rabbit .input-group > input:not(.form-check-input), #div_add_rabbit .input-group > textarea, .form_details .input-group > input:not(.form-check-input), .form_details .input-group > textarea,
 .input-group > .form-select {
   position: relative;
   flex: 1 1 auto;
   width: 1%;
   min-width: 0;
 }
-.input-group > .form-control:focus, #div_add_rabbit .input-group > input:focus:not(.form-check-input), #div_add_rabbit .input-group > textarea:focus,
+.input-group > .form-control:focus, #div_add_rabbit .input-group > input:focus:not(.form-check-input), #div_add_rabbit .input-group > textarea:focus, .form_details .input-group > input:focus:not(.form-check-input), .form_details .input-group > textarea:focus,
 .input-group > .form-select:focus {
   z-index: 3;
 }
@@ -2455,7 +2457,7 @@ textarea.form-control-lg {
   border-radius: 0.25rem;
 }
 
-.input-group-lg > .form-control, #div_add_rabbit .input-group-lg > input:not(.form-check-input), #div_add_rabbit .input-group-lg > textarea,
+.input-group-lg > .form-control, #div_add_rabbit .input-group-lg > input:not(.form-check-input), #div_add_rabbit .input-group-lg > textarea, .form_details .input-group-lg > input:not(.form-check-input), .form_details .input-group-lg > textarea,
 .input-group-lg > .form-select,
 .input-group-lg > .input-group-text,
 .input-group-lg > .btn {
@@ -2464,7 +2466,7 @@ textarea.form-control-lg {
   border-radius: 0.3rem;
 }
 
-.input-group-sm > .form-control, #div_add_rabbit .input-group-sm > input:not(.form-check-input), #div_add_rabbit .input-group-sm > textarea,
+.input-group-sm > .form-control, #div_add_rabbit .input-group-sm > input:not(.form-check-input), #div_add_rabbit .input-group-sm > textarea, .form_details .input-group-sm > input:not(.form-check-input), .form_details .input-group-sm > textarea,
 .input-group-sm > .form-select,
 .input-group-sm > .input-group-text,
 .input-group-sm > .btn {
@@ -2523,7 +2525,7 @@ textarea.form-control-lg {
   display: block;
 }
 
-.was-validated .form-control:valid, .was-validated #div_add_rabbit input:valid:not(.form-check-input), #div_add_rabbit .was-validated input:valid:not(.form-check-input), .was-validated #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated textarea:valid, .form-control.is-valid, #div_add_rabbit input.is-valid:not(.form-check-input), #div_add_rabbit textarea.is-valid {
+.was-validated .form-control:valid, .was-validated #div_add_rabbit input:valid:not(.form-check-input), #div_add_rabbit .was-validated input:valid:not(.form-check-input), .was-validated #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated textarea:valid, .was-validated .form_details input:valid:not(.form-check-input), .form_details .was-validated input:valid:not(.form-check-input), .was-validated .form_details textarea:valid, .form_details .was-validated textarea:valid, .form-control.is-valid, #div_add_rabbit input.is-valid:not(.form-check-input), #div_add_rabbit textarea.is-valid, .form_details input.is-valid:not(.form-check-input), .form_details textarea.is-valid {
   border-color: #198754;
   padding-right: calc(1.5em + 0.75rem);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
@@ -2531,12 +2533,12 @@ textarea.form-control-lg {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
-.was-validated .form-control:valid:focus, .was-validated #div_add_rabbit input:valid:focus:not(.form-check-input), #div_add_rabbit .was-validated input:valid:focus:not(.form-check-input), .was-validated #div_add_rabbit textarea:valid:focus, #div_add_rabbit .was-validated textarea:valid:focus, .form-control.is-valid:focus, #div_add_rabbit input.is-valid:focus:not(.form-check-input), #div_add_rabbit textarea.is-valid:focus {
+.was-validated .form-control:valid:focus, .was-validated #div_add_rabbit input:valid:focus:not(.form-check-input), #div_add_rabbit .was-validated input:valid:focus:not(.form-check-input), .was-validated #div_add_rabbit textarea:valid:focus, #div_add_rabbit .was-validated textarea:valid:focus, .was-validated .form_details input:valid:focus:not(.form-check-input), .form_details .was-validated input:valid:focus:not(.form-check-input), .was-validated .form_details textarea:valid:focus, .form_details .was-validated textarea:valid:focus, .form-control.is-valid:focus, #div_add_rabbit input.is-valid:focus:not(.form-check-input), #div_add_rabbit textarea.is-valid:focus, .form_details input.is-valid:focus:not(.form-check-input), .form_details textarea.is-valid:focus {
   border-color: #198754;
   box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }
 
-.was-validated textarea.form-control:valid, .was-validated #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated textarea:valid, textarea.form-control.is-valid, #div_add_rabbit textarea.is-valid {
+.was-validated textarea.form-control:valid, .was-validated #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated textarea:valid, .was-validated .form_details textarea:valid, .form_details .was-validated textarea:valid, textarea.form-control.is-valid, #div_add_rabbit textarea.is-valid, .form_details textarea.is-valid {
   padding-right: calc(1.5em + 0.75rem);
   background-position: top calc(0.375em + 0.1875rem) right calc(0.375em + 0.1875rem);
 }
@@ -2572,12 +2574,12 @@ textarea.form-control-lg {
   margin-left: 0.5em;
 }
 
-.was-validated .input-group .form-control:valid, .was-validated .input-group #div_add_rabbit input:valid:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:valid:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated .input-group textarea:valid, .input-group .form-control.is-valid, .input-group #div_add_rabbit input.is-valid:not(.form-check-input), #div_add_rabbit .input-group input.is-valid:not(.form-check-input), .input-group #div_add_rabbit textarea.is-valid, #div_add_rabbit .input-group textarea.is-valid,
+.was-validated .input-group .form-control:valid, .was-validated .input-group #div_add_rabbit input:valid:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:valid:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:valid, #div_add_rabbit .was-validated .input-group textarea:valid, .was-validated .input-group .form_details input:valid:not(.form-check-input), .form_details .was-validated .input-group input:valid:not(.form-check-input), .was-validated .input-group .form_details textarea:valid, .form_details .was-validated .input-group textarea:valid, .input-group .form-control.is-valid, .input-group #div_add_rabbit input.is-valid:not(.form-check-input), #div_add_rabbit .input-group input.is-valid:not(.form-check-input), .input-group #div_add_rabbit textarea.is-valid, #div_add_rabbit .input-group textarea.is-valid, .input-group .form_details input.is-valid:not(.form-check-input), .form_details .input-group input.is-valid:not(.form-check-input), .input-group .form_details textarea.is-valid, .form_details .input-group textarea.is-valid,
 .was-validated .input-group .form-select:valid,
 .input-group .form-select.is-valid {
   z-index: 1;
 }
-.was-validated .input-group .form-control:valid:focus, .was-validated .input-group #div_add_rabbit input:valid:focus:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:valid:focus:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:valid:focus, #div_add_rabbit .was-validated .input-group textarea:valid:focus, .input-group .form-control.is-valid:focus, .input-group #div_add_rabbit input.is-valid:focus:not(.form-check-input), #div_add_rabbit .input-group input.is-valid:focus:not(.form-check-input), .input-group #div_add_rabbit textarea.is-valid:focus, #div_add_rabbit .input-group textarea.is-valid:focus,
+.was-validated .input-group .form-control:valid:focus, .was-validated .input-group #div_add_rabbit input:valid:focus:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:valid:focus:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:valid:focus, #div_add_rabbit .was-validated .input-group textarea:valid:focus, .was-validated .input-group .form_details input:valid:focus:not(.form-check-input), .form_details .was-validated .input-group input:valid:focus:not(.form-check-input), .was-validated .input-group .form_details textarea:valid:focus, .form_details .was-validated .input-group textarea:valid:focus, .input-group .form-control.is-valid:focus, .input-group #div_add_rabbit input.is-valid:focus:not(.form-check-input), #div_add_rabbit .input-group input.is-valid:focus:not(.form-check-input), .input-group #div_add_rabbit textarea.is-valid:focus, #div_add_rabbit .input-group textarea.is-valid:focus, .input-group .form_details input.is-valid:focus:not(.form-check-input), .form_details .input-group input.is-valid:focus:not(.form-check-input), .input-group .form_details textarea.is-valid:focus, .form_details .input-group textarea.is-valid:focus,
 .was-validated .input-group .form-select:valid:focus,
 .input-group .form-select.is-valid:focus {
   z-index: 3;
@@ -2612,7 +2614,7 @@ textarea.form-control-lg {
   display: block;
 }
 
-.was-validated .form-control:invalid, .was-validated #div_add_rabbit input:invalid:not(.form-check-input), #div_add_rabbit .was-validated input:invalid:not(.form-check-input), .was-validated #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated textarea:invalid, .form-control.is-invalid, #div_add_rabbit input.is-invalid:not(.form-check-input), #div_add_rabbit textarea.is-invalid {
+.was-validated .form-control:invalid, .was-validated #div_add_rabbit input:invalid:not(.form-check-input), #div_add_rabbit .was-validated input:invalid:not(.form-check-input), .was-validated #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated textarea:invalid, .was-validated .form_details input:invalid:not(.form-check-input), .form_details .was-validated input:invalid:not(.form-check-input), .was-validated .form_details textarea:invalid, .form_details .was-validated textarea:invalid, .form-control.is-invalid, #div_add_rabbit input.is-invalid:not(.form-check-input), #div_add_rabbit textarea.is-invalid, .form_details input.is-invalid:not(.form-check-input), .form_details textarea.is-invalid {
   border-color: #dc3545;
   padding-right: calc(1.5em + 0.75rem);
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
@@ -2620,12 +2622,12 @@ textarea.form-control-lg {
   background-position: right calc(0.375em + 0.1875rem) center;
   background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
-.was-validated .form-control:invalid:focus, .was-validated #div_add_rabbit input:invalid:focus:not(.form-check-input), #div_add_rabbit .was-validated input:invalid:focus:not(.form-check-input), .was-validated #div_add_rabbit textarea:invalid:focus, #div_add_rabbit .was-validated textarea:invalid:focus, .form-control.is-invalid:focus, #div_add_rabbit input.is-invalid:focus:not(.form-check-input), #div_add_rabbit textarea.is-invalid:focus {
+.was-validated .form-control:invalid:focus, .was-validated #div_add_rabbit input:invalid:focus:not(.form-check-input), #div_add_rabbit .was-validated input:invalid:focus:not(.form-check-input), .was-validated #div_add_rabbit textarea:invalid:focus, #div_add_rabbit .was-validated textarea:invalid:focus, .was-validated .form_details input:invalid:focus:not(.form-check-input), .form_details .was-validated input:invalid:focus:not(.form-check-input), .was-validated .form_details textarea:invalid:focus, .form_details .was-validated textarea:invalid:focus, .form-control.is-invalid:focus, #div_add_rabbit input.is-invalid:focus:not(.form-check-input), #div_add_rabbit textarea.is-invalid:focus, .form_details input.is-invalid:focus:not(.form-check-input), .form_details textarea.is-invalid:focus {
   border-color: #dc3545;
   box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
 }
 
-.was-validated textarea.form-control:invalid, .was-validated #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated textarea:invalid, textarea.form-control.is-invalid, #div_add_rabbit textarea.is-invalid {
+.was-validated textarea.form-control:invalid, .was-validated #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated textarea:invalid, .was-validated .form_details textarea:invalid, .form_details .was-validated textarea:invalid, textarea.form-control.is-invalid, #div_add_rabbit textarea.is-invalid, .form_details textarea.is-invalid {
   padding-right: calc(1.5em + 0.75rem);
   background-position: top calc(0.375em + 0.1875rem) right calc(0.375em + 0.1875rem);
 }
@@ -2661,12 +2663,12 @@ textarea.form-control-lg {
   margin-left: 0.5em;
 }
 
-.was-validated .input-group .form-control:invalid, .was-validated .input-group #div_add_rabbit input:invalid:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:invalid:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated .input-group textarea:invalid, .input-group .form-control.is-invalid, .input-group #div_add_rabbit input.is-invalid:not(.form-check-input), #div_add_rabbit .input-group input.is-invalid:not(.form-check-input), .input-group #div_add_rabbit textarea.is-invalid, #div_add_rabbit .input-group textarea.is-invalid,
+.was-validated .input-group .form-control:invalid, .was-validated .input-group #div_add_rabbit input:invalid:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:invalid:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:invalid, #div_add_rabbit .was-validated .input-group textarea:invalid, .was-validated .input-group .form_details input:invalid:not(.form-check-input), .form_details .was-validated .input-group input:invalid:not(.form-check-input), .was-validated .input-group .form_details textarea:invalid, .form_details .was-validated .input-group textarea:invalid, .input-group .form-control.is-invalid, .input-group #div_add_rabbit input.is-invalid:not(.form-check-input), #div_add_rabbit .input-group input.is-invalid:not(.form-check-input), .input-group #div_add_rabbit textarea.is-invalid, #div_add_rabbit .input-group textarea.is-invalid, .input-group .form_details input.is-invalid:not(.form-check-input), .form_details .input-group input.is-invalid:not(.form-check-input), .input-group .form_details textarea.is-invalid, .form_details .input-group textarea.is-invalid,
 .was-validated .input-group .form-select:invalid,
 .input-group .form-select.is-invalid {
   z-index: 2;
 }
-.was-validated .input-group .form-control:invalid:focus, .was-validated .input-group #div_add_rabbit input:invalid:focus:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:invalid:focus:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:invalid:focus, #div_add_rabbit .was-validated .input-group textarea:invalid:focus, .input-group .form-control.is-invalid:focus, .input-group #div_add_rabbit input.is-invalid:focus:not(.form-check-input), #div_add_rabbit .input-group input.is-invalid:focus:not(.form-check-input), .input-group #div_add_rabbit textarea.is-invalid:focus, #div_add_rabbit .input-group textarea.is-invalid:focus,
+.was-validated .input-group .form-control:invalid:focus, .was-validated .input-group #div_add_rabbit input:invalid:focus:not(.form-check-input), #div_add_rabbit .was-validated .input-group input:invalid:focus:not(.form-check-input), .was-validated .input-group #div_add_rabbit textarea:invalid:focus, #div_add_rabbit .was-validated .input-group textarea:invalid:focus, .was-validated .input-group .form_details input:invalid:focus:not(.form-check-input), .form_details .was-validated .input-group input:invalid:focus:not(.form-check-input), .was-validated .input-group .form_details textarea:invalid:focus, .form_details .was-validated .input-group textarea:invalid:focus, .input-group .form-control.is-invalid:focus, .input-group #div_add_rabbit input.is-invalid:focus:not(.form-check-input), #div_add_rabbit .input-group input.is-invalid:focus:not(.form-check-input), .input-group #div_add_rabbit textarea.is-invalid:focus, #div_add_rabbit .input-group textarea.is-invalid:focus, .input-group .form_details input.is-invalid:focus:not(.form-check-input), .form_details .input-group input.is-invalid:focus:not(.form-check-input), .input-group .form_details textarea.is-invalid:focus, .form_details .input-group textarea.is-invalid:focus,
 .was-validated .input-group .form-select:invalid:focus,
 .input-group .form-select.is-invalid:focus {
   z-index: 3;
@@ -10065,6 +10067,23 @@ body {
   top: 2px;
   right: calc(2px + 15%);
   z-index: 999;
+}
+
+.form_details .row {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;
+}
+.form_details .form-input {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.form_details label {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+.form_details table {
+  width: 100%;
 }
 
 /*# sourceMappingURL=master.css.map */

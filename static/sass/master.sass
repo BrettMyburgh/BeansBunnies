@@ -288,3 +288,31 @@ body
   top: 2px;
   right: calc(2px + 15%);
   z-index: 999;
+
+.form_details
+  .row
+    margin-top: 5px
+    margin-bottom: 5px
+    display: flex
+  .form-input
+    @extend .col-md-9
+    margin-top: 0px
+    margin-bottom: 0px
+  label
+    @extend .col-md-3
+    @extend .form-label
+    margin-top: auto
+    margin-bottom: auto
+  input:not(.form-check-input)
+    @extend .form-control
+  textarea
+    @extend .form-control
+  .dropdown
+    @extend .col-md-9
+  table
+    width: 100%
+    .tblDate
+      @extend .col-md-5
+    .tblWeight
+      @extend .col-md-5
+    
