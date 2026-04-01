@@ -8,7 +8,7 @@ from django.contrib import messages
 from datetime import date, timedelta
 from django.http import HttpResponseRedirect, JsonResponse
 
-from db.models import Rabbit, RabbitAbandoned, RabbitImage, RabbitLitter, RabbitWeight
+from db.models import Rabbit, RabbitAbandoned, RabbitImage, RabbitLitter, RabbitWeight, RabbitFeed
 
 # Create your views here.
 def rabbit_detail(request, pk):
@@ -34,6 +34,30 @@ def rabbit_detail(request, pk):
             abandon_details = None
 
     weights = RabbitWeight.objects.filter(rabbit_id=rabbit)
+    last_weight = weights.order_by('-date').first()
+    feeds = RabbitFeed.objects.filter(rabbit=rabbit).order_by('-date', 'feed_number')
+    day = date.today()
+    daily_feeds = []
+    data = {}
+    max_feed_number = 0
+    for feed in feeds:
+        if feed.date != day:
+            daily_feeds.append(data)
+            data.clear()
+            day = feed.date
+            data["date"] = day
+            data["feeds"] = []
+        data["feeds"].append(feed.amount)
+        data["feed_amount"] += feed.amount
+        if feed.feed_number > max_feed_number:
+            max_feed_number = feed.feed_number
+        
+    suggested_feeds = {}
+    if last_weight:
+        suggested_feeds["amount"] = round(float(last_weight.weight) * 0.2, 2)
+        suggested_feeds["suggested_feeds"] = 2
+        suggested_feeds["suggested_amount"] = round(feed["suggested_feeds"] * feed["amount"], 2)
+
     file_uploader = {
         "widget_id":    "myUpload",
         "label":        "Add Images",
@@ -50,7 +74,11 @@ def rabbit_detail(request, pk):
                                                   'kit': is_kit, 
                                                   'fosters': fosters, 
                                                   'abandon_details': abandon_details,
-                                                  'weights': weights})
+                                                  'weights': weights,
+                                                  'feed': suggested_feeds,
+                                                  'feeds': daily_feeds,
+                                                  'max_feed_number': range(max_feed_number)
+                                                  })
 
 
 def rabbit_edit(request, pk):

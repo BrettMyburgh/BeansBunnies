@@ -63,3 +63,13 @@ class RabbitWeight(models.Model):
 
 	def __int__(self):
 		return self.weight_id or f'Weight {self.pk}'
+	
+class RabbitFeed(models.Model):
+	feed_id = models.AutoField(primary_key=True)
+	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='feeds')
+	amount = models.DecimalField(max_digits=5, decimal_places=2)
+	feed_number = models.IntegerField()
+	date = models.DateField()
+
+	def __int__(self):
+		return self.feed_id or f'Feed {self.pk}'

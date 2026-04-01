@@ -237,6 +237,66 @@
                 </div>
               </div>
             </form>
+            <form>
+              {% csrf_token %}
+              <div class="form_details">
+                <table id="tblPastFeeds">
+                  <tr>
+                    <th>Date</th>
+                    <th>Total Food</th>
+                    <th>number of feeds</th>
+                    {% for i in max_feed_number %}
+                      <th>feed {{ i }}</th>
+                    {% endfor %}
+                  </tr>
+                  {% for feed in feeds %}
+                  <tr>
+                    <td id="tdDate">{{ feed.date|date:"Y-m-d" }}</td>
+                    <td id="tdFeedAmount">{{ feed.feed_amount }}</td>
+                    <td id="tdSuggestedFeeds">{{ feed.feed_count }}</td>
+                    {% for i in max_feed_number %}
+                      {% if feed.feeds.i %}
+                        <td id="tdFeed{{ i }}">{{ feed.feeds.i }}</td>
+                      {% else %}
+                        <td id="tdFeed{{ i }}">-</td>
+                      {% endif %}
+                    {% endfor %}
+                  </tr>
+                  {% endfor %}
+                </table>
+                <table id="tblSuggestedFeeds">
+                  <tr>
+                    <th>Date</th>
+                    <th>feed amount (milliliters)</th>
+                    <th>suggested feeds</th>
+                    <th>suggested amount (milliliters)</th>
+                  </tr>
+                  <tr>
+                    <td id="tdDate"></td>
+                    <td id="tdFeedAmount">{{ feed.amount }}</td>
+                    <td id="tdSuggestedFeeds">{{ feed.suggested_feeds }}</td>
+                    <td id="tdSuggestedAmount">{{ feed.suggested_amount }}</td>
+                  </tr>
+                </table>
+                <div id="divFeedControls">
+                  <div class="row">
+                    <label class="form-label" for="txtFeeds">Feeds</label>
+                    <div class="form-input">
+                      <input type="number" id="txtFeeds" class="form-control" name="feeds" value="{{ feed.suggested_feeds }}">
+                    </div>
+                  </div>
+                  <div class="row">
+                    <label class="form-label" for="txtFeedAmount">Feed amount (milliliters)</label>
+                    <div class="form-input">
+                      <input type="number" id="txtFeedAmount" class="form-control" name="feed_amount" value="{{ feed.suggested_amount }}">
+                    </div>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btnPrimary" onclick="CalculateFeed()">Calculate</button>
+                  </div>
+                </div>
+              </div>
+            </form>
             <form id="rabbitWeight" method="post" action="{% url 'bunny_view:rabbit_weight' rabbit.id %}" enctype="multipart/form-data" onsubmit="return doAjaxPost(this)">
               {% csrf_token %}
               <div class="form_details">
