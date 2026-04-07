@@ -69,7 +69,7 @@ class RabbitFeed(models.Model):
 	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='feeds')
 	amount = models.DecimalField(max_digits=5, decimal_places=2)
 	feed_number = models.IntegerField()
-	date = models.DateField()
+	date = models.DateTimeField()
 
 	def __int__(self):
 		return self.feed_id or f'Feed {self.pk}'

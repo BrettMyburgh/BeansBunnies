@@ -40,23 +40,27 @@ def rabbit_detail(request, pk):
     daily_feeds = []
     data = {}
     max_feed_number = 0
-    for feed in feeds:
-        if feed.date != day:
-            daily_feeds.append(data)
-            data.clear()
-            day = feed.date
-            data["date"] = day
-            data["feeds"] = []
-        data["feeds"].append(feed.amount)
-        data["feed_amount"] += feed.amount
-        if feed.feed_number > max_feed_number:
-            max_feed_number = feed.feed_number
+    if len(feeds) > 0:
+        for feed in feeds:
+            if feed.date != day:
+                daily_feeds.append(data)
+                data.clear()
+                day = feed.date
+                data["date"] = day
+                data["feeds"] = []
+            data["feeds"].append(feed.amount)
+            data["feed_amount"] += feed.amount
+            if feed.feed_number > max_feed_number:
+                max_feed_number = feed.feed_number
         
     suggested_feeds = {}
     if last_weight:
         suggested_feeds["amount"] = round(float(last_weight.weight) * 0.2, 2)
         suggested_feeds["suggested_feeds"] = 2
-        suggested_feeds["suggested_amount"] = round(feed["suggested_feeds"] * feed["amount"], 2)
+        suggested_feeds["suggested_amount"] = round(suggested_feeds["suggested_feeds"] * suggested_feeds["amount"], 2)
+        if len(feeds) > 0:
+            days_feeds = feeds.filter(date__date=date.today)
+            suggested_feeds = calculate_feeds(days_feeds, suggested_feeds)
 
     file_uploader = {
         "widget_id":    "myUpload",
@@ -292,4 +296,53 @@ def rabbit_weight(request, pk):
             messages.append({'tags': 'success', 'message': 'Added weight for rabbit: {}'.format(rabbit)})
         else:
             messages.append({'tags': 'error', 'message': 'Invalid weight or date. Please try again.'})
-    return JsonResponse({'type': 'success', 'messages': messages, 'button': 'btnWeightSave'})
+    return JsonResponse({'type': 'success', 'messages': messages, 'button': 'btnWeightSave'}, safe=False)
+
+def rabbit_feed(request, pk):
+    number_of_feeds = request.POST.get("feeds")
+    feed_amount = request.POST.get("feed_amount")
+    suggested_total = request.POST.get("suggestedTotal") if request.POST.get("suggestedTotal") != "" else 0
+    suggested_feeds = request.POST.get("suggestedFeeds") if request.POST.get("suggestedFeeds") != "" else 2
+    suggested_amount = request.POST.get("suggestedAmounts") if request.POST.get("suggestedAmounts") != "" else 0
+    
+    rabbit = get_object_or_404(Rabbit, pk=pk)
+    feeds = RabbitFeed.objects.filter(rabbit=rabbit).filter(date__date=date.today)
+    feed_number = 1
+    if len(feeds) != 0:
+        feed_number = feeds.order_by("-feed_number").first().feed_number + 1
+    messages = []
+    feed_suggestion = {"total_amount": 0, "feeds":0, "amount":0}
+
+    if feed_amount != "":
+        RabbitFeed.objects.create(
+            rabbit = rabbit,
+            amount = feed_amount,
+            feed_number = feed_number,
+            date = date.now
+        )
+
+    if number_of_feeds != "":
+        if len(feeds) + 1 >= number_of_feeds:
+            messages.append({'tags': 'error', 'message': 'Invalid number of feeds. Please set a valid number'})
+        else:
+            feed_suggestion["feeds"] = number_of_feeds
+    
+    feed_suggestion = calculate_feeds(feeds, feed_suggestion)
+
+    return JsonResponse()
+
+def calculate_feeds(feeds, feed_suggestion):
+    total_amount = feed_suggestion["total_amount"]
+    no_of_feeds = feed_suggestion["feeds"]
+    feed_amount = feed_suggestion["amount"]
+    feeds_left = no_of_feeds - len(feeds)
+    amount_left = total_amount
+    for feed in feeds:
+        amount_left -= feed.amount
+    if feeds_left == 0:
+        feeds_left = 1
+        feed_suggestion["feeds"] += 1
+    
+    feed_amount = amount_left/feeds_left
+    feed_suggestion["amount"] = feed_amount
+    return feed_suggestion
