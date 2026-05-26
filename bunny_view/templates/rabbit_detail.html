@@ -24,6 +24,17 @@
       .bb-image {width:100%; height:auto; border-radius:4px; object-fit:cover; }
       .bb-info p { margin-bottom: .35rem; }
       .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
+      .weights-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+      .weights-table tr { border-bottom: 1px solid #e9ecef; }
+      .weights-table th, .weights-table td { padding: 0.5rem 0.75rem; text-align: left; }
+      .weights-table th { font-weight: 600; background-color: #f8f9fa; }
+      .weights-table td { color: #495057; }
+      .weights-expand-button { display: inline-block; margin-top: 0.5rem; padding: 0.25rem 0; background: none; border: none; color: #0d6efd; text-decoration: none; cursor: pointer; font-size: 0.95rem; }
+      .weights-expand-button:hover { text-decoration: underline; }
+      .weights-expand-button::after { content: " ▼"; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; }
+      .weights-expand-button[aria-expanded="true"]::after { transform: rotate(180deg); }
+      .remaining-weights { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e9ecef; }
+      .remaining-weights.collapsed { display: none; }
 
       @media (max-width: 768px) {
         .bb-main { flex-direction: column-reverse; }
@@ -250,23 +261,43 @@
                       {% csrf_token %}
                       <div class="form_details">
                         {% if weights %}
-                          <table>
-                        {% else %}
-                          <table style="display: none;">
-                        {% endif %}
-                          <tr>
-                            <th class="tblDate">Date</th>
-                            <th class="tblWeight">Weight (grams)</th>
-                            <th class="tblDelete">Delete</th>
-                            </tr>
-                          {% for weight in weights %}
+                          <table class="weights-table">
                             <tr>
-                              <td>{{ weight.date|date:"Y-m-d" }}</td>
-                              <td>{{ weight.weight }}</td>
-                              <td></td>
+                              <th class="tblDate">Date</th>
+                              <th class="tblWeight">Weight (grams)</th>
                             </tr>
-                          {% endfor %}
-                        </table>
+                            {% for weight in weights|slice:":4" %}
+                              <tr>
+                                <td>{{ weight.date|date:"Y-m-d" }}</td>
+                                <td>{{ weight.weight }}</td>
+                              </tr>
+                            {% endfor %}
+                          </table>
+                          {% if weights|length > 4 %}
+                            <button type="button" class="weights-expand-button" aria-expanded="false" onclick="toggleRemainingWeights(event)">Show {{ weights|length|add:"-4" }} more weights</button>
+                            <div class="remaining-weights collapsed" id="remainingWeights">
+                              <table class="weights-table">
+                                <tr>
+                                  <th class="tblDate">Date</th>
+                                  <th class="tblWeight">Weight (grams)</th>
+                                </tr>
+                                {% for weight in weights|slice:"4:" %}
+                                  <tr>
+                                    <td>{{ weight.date|date:"Y-m-d" }}</td>
+                                    <td>{{ weight.weight }}</td>
+                                  </tr>
+                                {% endfor %}
+                              </table>
+                            </div>
+                          {% endif %}
+                        {% else %}
+                          <table class="weights-table" style="display: none;">
+                            <tr>
+                              <th class="tblDate">Date</th>
+                              <th class="tblWeight">Weight (grams)</th>
+                            </tr>
+                          </table>
+                        {% endif %}
                         <div class="d-flex">
                           <button type="button" class="btn btnPrimary" style="margin-top: 0.5rem;" onclick="AddWeight()">Add Weight</button>
                           <button id="btnWeightSave" type="submit" class="btn btnPrimary ms-auto" style="margin-top: 0.5rem; display:none;">Save Weight</button>
@@ -276,7 +307,7 @@
                   </div>
                 </div>
               </div>
-              <div class="accordion-item">
+              <div class="accordion-item accordian-feed">
                 <h2 class="accordion-header" id="headingFeed">
                   <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFeed" aria-expanded="false" aria-controls="collapseFeed">
                     Feed
@@ -302,12 +333,8 @@
                             <td id="tdDate">{{ feed.date|date:"Y-m-d" }}</td>
                             <td id="tdFeedAmount">{{ feed.feed_amount }}</td>
                             <td id="tdSuggestedFeeds">{{ feed.feed_count }}</td>
-                            {% for i in max_feed_number %}
-                              {% if feed.feeds.i %}
-                                <td id="tdFeed{{ i }}">{{ feed.feeds.i }}</td>
-                              {% else %}
-                                <td id="tdFeed{{ i }}">-</td>
-                              {% endif %}
+                            {% for feed_item in feed.feeds %}
+                              <td id="tdFeed{{ forloop.counter0 }}">{{ feed_item|default:"-" }}</td>
                             {% endfor %}
                           </tr>
                           {% endfor %}
@@ -325,7 +352,7 @@
                             <th>suggested amount (milliliters)</th>
                           </tr>
                           <tr>
-                            <td id="tdDate"></td>
+                            <td id="tdDate">{% now "Y-m-d" %}</td>
                             <td id="tdFeedAmount" name="suggestedTotal">{{ feed.amount }}</td>
                             <td id="tdSuggestedFeeds" name="suggestedFeeds">{{ feed.suggested_feeds }}</td>
                             <td id="tdSuggestedAmount" name="suggestedAmounts">{{ feed.suggested_amount }}</td>
@@ -345,7 +372,7 @@
                             </div>
                           </div>
                           <div>
-                            <button type="button" class="btn btnPrimary" onclick="CalculateFeed()">Calculate</button>
+                            <button type="submit" class="btn btnPrimary">Calculate</button>
                           </div>
                         </div>
                       </div>
@@ -613,6 +640,21 @@
           }
         }
 
+        function toggleRemainingWeights(event) {
+          event.preventDefault();
+          var button = event.target.closest('.weights-expand-button');
+          var remainingWeights = document.getElementById('remainingWeights');
+          var isExpanded = button.getAttribute('aria-expanded') === 'true';
+          
+          button.setAttribute('aria-expanded', !isExpanded);
+          remainingWeights.classList.toggle('collapsed', isExpanded);
+          
+          var remainingCount = parseInt(button.textContent.match(/\d+/)[0]);
+          button.textContent = isExpanded ? 
+            'Show ' + remainingCount + ' more weights' : 
+            'Hide ' + remainingCount + ' weights';
+        }
+
         function AddWeight(){
           var table = document.querySelector("#rabbitWeight table");
           table.style.display = "block";
@@ -645,20 +687,33 @@
         }
 
         function doAjaxPost(form){
-          debugger;
           var formData = new FormData(form);
-          var csrftoken = jQuery("[name=csrfmiddlewaretoken]").val();
-          formData.append("csrfmiddlewaretoken", csrftoken);
-          $.post(form.action, formData).done(function(data){
-            if(data.button){
-              HideBtn(data.button);
-            }
-            if (data.messages){
-              data.messages.forEach(function(msg){
-                addMessage(msg.tags, msg.message);
-              });
+          $.ajax({
+            url: form.action,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data){
+              if(data.button){
+                HideBtn(data.button);
+              }
+              if (data.messages){
+                data.messages.forEach(function(msg){
+                  addMessage(msg.tags, msg.message);
+                });
+              }
+            },
+            error: function(xhr, status, error){
+              console.error('Form submission error:', error);
+              if(xhr.status === 403){
+                addMessage('error', 'Permission denied. Please refresh and try again.');
+              } else {
+                addMessage('error', 'An error occurred while submitting the form.');
+              }
             }
           });
+          return false;
         }
 
   </script>

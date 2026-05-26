@@ -10085,5 +10085,27 @@ body {
 .form_details table {
   width: 100%;
 }
+#accordionFeedWeight .accordion-button {
+  background-color: #ececec !important;
+  color: #000000 !important;
+}
+#accordionFeedWeight .accordion-button:not(.collapsed) {
+  color: #000000 !important;
+}
+#accordionFeedWeight .accordion-button::after {
+  color: #000000 !important;
+}
+
+.accordian-feed {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+}
+
+#tblSuggestedFeeds {
+  text-align: center;
+}
+
+#tblPastFeeds {
+  text-align: center;
+}
 
 /*# sourceMappingURL=master.css.map */

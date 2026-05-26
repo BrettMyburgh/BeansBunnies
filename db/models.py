@@ -73,3 +73,11 @@ class RabbitFeed(models.Model):
 
 	def __int__(self):
 		return self.feed_id or f'Feed {self.pk}'
+	
+class RabbitFeedNumbers(models.Model):
+	feed_id = models.AutoField(primary_key=True)
+	rabbit = models.ForeignKey(Rabbit, on_delete=models.CASCADE, related_name='daily_feeds')
+	number_of_feeds = models.IntegerField()
+
+	def __int__(self):
+		return self.feed_id or f'Feed {self.pk}'
