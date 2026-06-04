@@ -6,14 +6,14 @@
   $secondary: #f8b5a0
 )
 
-@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DynaPuff:wght@400..700&display=swap')
 
 
 // Variables
-$body-bg: #ececec;
-$primary: #af7239;
-$secondary: #f8b5a0;
-$breakpoint-tablet: 768px;
+$body-bg: #ececec
+$primary: #af7239
+$secondary: #f8b5a0
+$breakpoint-tablet: 768px
 
 // Font Mixins
 =dynapuff-font
@@ -27,13 +27,13 @@ $breakpoint-tablet: 768px;
 @mixin respond-to($media) 
   @if $media == 'mobile' 
     @media (max-width: $breakpoint-mobile) 
-      @content;
+      @content
   @else if $media == 'tablet' 
     @media (max-width: $breakpoint-tablet) 
-      @content;
+      @content
   @else if $media == 'desktop' 
     @media (min-width: $breakpoint-desktop) 
-      @content;
+      @content
 
 // Base
 body
@@ -105,10 +105,10 @@ body
   margin-bottom: 0
 
 .rabbitCard
-  width: calc((100% - 72px)/ 3);
+  width: calc((100% - 72px)/ 3)
   max-width: 230px
-  margin-right: 24px;
-  margin-bottom: 24px;
+  margin-right: 24px
+  margin-bottom: 24px
   @include respond-to('tablet')
     width:100%
     max-width:100%
@@ -138,9 +138,9 @@ body
     right: 10px
     color: $secondary
   @include respond-to('tablet')
-    width: calc(100% - 48px);
-    margin-right: 24px;
-    margin-bottom: 24px;
+    width: calc(100% - 48px)
+    margin-right: 24px
+    margin-bottom: 24px
 
 .imgOverlay
   content: ""
@@ -200,7 +200,7 @@ body
 
 .screen-height
   height: calc(100vh)
-  flex: 0 0 auto;
+  flex: 0 0 auto
   width: 227px
 
 .screen-height-child
@@ -265,8 +265,8 @@ body
 
 .cropper-container
   .img
-    display: block;
-    max-width: 100%;
+    display: block
+    max-width: 100%
 
 #crop_modal_save
   float: right
@@ -284,10 +284,10 @@ body
     margin-right: auto
 
 .carousel_button_group
-  position: absolute;
-  top: 2px;
-  right: calc(2px + 15%);
-  z-index: 3;
+  position: absolute
+  top: 2px
+  right: calc(2px + 15%)
+  z-index: 3
 
 .form_details
   .row
@@ -326,7 +326,7 @@ body
     color: #000000 !important
 
 .accordian-feed
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125) !important
 
 #tblSuggestedFeeds
   text-align: center
