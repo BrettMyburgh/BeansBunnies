@@ -1,4 +1,5 @@
 import base64
+import decimal
 import json
 import uuid
 
@@ -41,17 +42,17 @@ def rabbit_detail(request, pk):
     if feed_numbers.exists():
         feeds_per_day = feed_numbers.first().number_of_feeds
 
-    day = date.today()
+    day = date.min
     daily_feeds = []
     data = {"feed_amount": 0, "feed_count": 0, "feeds": []}
     max_feed_number = feeds_per_day
     if len(feeds) > 0:
         for feed in feeds:
-            if feed.date != day:
+            if feed.date.date() != day:
                 if data["feed_amount"] > 0:
                     daily_feeds.append(data)
                 data = {"feed_amount": 0, "feed_count": 0, "feeds": []}
-                day = feed.date
+                day = feed.date.date()
                 data["date"] = day
                 data["suggested_amount"] = 0
             data["feeds"].append(feed.amount)
@@ -60,7 +61,8 @@ def rabbit_detail(request, pk):
             if feed.feed_number > max_feed_number:
                 max_feed_number = feed.feed_number
     
-    daily_feeds.append(data)
+    if len(data["feeds"]) > 0:
+        daily_feeds.append(data)
 
     for daily_feed in daily_feeds:
         while len(daily_feed["feeds"]) < max_feed_number:
@@ -74,15 +76,32 @@ def rabbit_detail(request, pk):
         if len(feeds) > 0:
             days_feeds = feeds.filter(date__date=date.today())
             suggested_feeds = calculate_feeds(days_feeds, suggested_feeds)
-    elif data["feed_amount"] > 0:
-        suggested_feeds["amount"] = round(data["feed_amount"]/len(data["feeds"]), 2)
-        suggested_feeds["feeds"] = feeds_per_day
-        suggested_feeds["total_amount"] = round(data["feed_amount"] * len(data["feeds"]), 2)
-        suggested_feeds["suggested_feeds"] = feeds_per_day
-        suggested_feeds["suggested_amount"] = round(suggested_feeds["suggested_feeds"] * suggested_feeds["amount"], 2)
-        suggested_feeds["date"] = data["date"]
-        days_feeds = feeds.filter(date__date=date.today())
+    elif len(daily_feeds) > 0:
+        data = {"feed_amount": 0, "feed_count": 0, "feeds": []}
+        for daily_feed in daily_feeds:
+            if daily_feed["date"] == date.today():
+                data = daily_feed
+        if data["feed_amount"] > 0:
+            suggested_feeds["amount"] = round(data["feed_amount"]/data["feed_count"], 2)
+            suggested_feeds["suggested_weight"] = round(suggested_feeds["amount"] * 20, 2)
+            suggested_feeds["feeds"] = feeds_per_day
+            suggested_feeds["total_amount"] = round(data["feed_amount"] * data["feed_count"], 2)
+            suggested_feeds["suggested_feeds"] = feeds_per_day
+            suggested_feeds["suggested_amount"] = round(suggested_feeds["suggested_feeds"] * suggested_feeds["amount"], 2)
+            suggested_feeds["date"] = data["date"]
+            days_feeds = feeds.filter(date__date=date.today())
+        else:
+            last_feed = daily_feeds[len(daily_feeds)-1]
+            suggested_feeds["suggested_weight"] = round(last_feed["feed_amount"]/last_feed["feed_count"] * 20, 2)
+            suggested_feeds["feeds"] = feeds_per_day
+            suggested_feeds["suggested_feeds"] = feeds_per_day
+            suggested_feeds["suggested_amount"] = round(suggested_feeds["suggested_feeds"] * (last_feed["feed_amount"]/last_feed["feed_count"]), 2)
+            suggested_feeds["date"] = last_feed["date"]
+            days_feeds = feeds.filter(date__date=date.today())
+            
         # suggested_feeds = calculate_feeds(days_feeds, suggested_feeds)
+    suggested_feeds["suggested_feeds"] = feeds_per_day
+    
 
     file_uploader = {
         "widget_id":    "myUpload",
@@ -333,12 +352,20 @@ def rabbit_feed(request, pk):
     rabbit = get_object_or_404(Rabbit, pk=pk)
     feeds = RabbitFeed.objects.filter(rabbit=rabbit)
     if(len(feeds) != 0):
-        feeds = feeds.filter(date__date=date.today)
+        feeds = feeds.filter(date__date=date.today())
     feed_number = 1
     if len(feeds) != 0:
         feed_number = feeds.order_by("-feed_number").first().feed_number + 1
     messages = []
     feed_suggestion = {"total_amount": 0, "feeds":0, "amount":0}
+
+    if number_of_feeds != "":
+        if feeds.count() + 1 > int(number_of_feeds):
+            messages.append({'tags': 'danger', 'message': 'Invalid number of feeds. Please set a valid number'})
+            return_data = {'type': 'failed', 'messages': messages}
+            return JsonResponse(return_data, safe=False)
+        else:
+            feed_suggestion["feeds"] = number_of_feeds
 
     if feed_amount != "":
         RabbitFeed.objects.create(
@@ -354,21 +381,26 @@ def rabbit_feed(request, pk):
             number_of_feeds = number_of_feeds
         )
 
-    if number_of_feeds != "":
-        if len(feeds) + 1 >= number_of_feeds:
-            messages.append({'tags': 'error', 'message': 'Invalid number of feeds. Please set a valid number'})
-        else:
-            feed_suggestion["feeds"] = number_of_feeds
-    
     feed_suggestion = calculate_feeds(feeds, feed_suggestion)
+    new_feed = {"amount": feed_amount, "number_of_feeds": number_of_feeds, "feed_number": feed_number, "date": date.today()}
 
-    return JsonResponse()
+    total_amount = decimal.Decimal(feed_amount)
+    if(len(feeds) != 0):
+        for feed in feeds:
+            total_amount += feed.amount
+
+    new_suggested_feeds = {"total_amount": feed_suggestion["total_amount"], "feeds":feed_suggestion["feeds"], "amount":feed_suggestion["amount"]}
+    new_suggested_feeds = calculate_suggested_feeds(new_feed, int(number_of_feeds), int(feed_number), new_suggested_feeds, total_amount)
+
+    messages.append({'tags': 'success', 'message': 'Added feed for rabbit: {}'.format(rabbit)})
+    return_data = {'type': 'success', 'messages': messages, 'feed_suggestion': new_suggested_feeds, 'feed': new_feed, 'button': 'btnFeedSave'}
+    return JsonResponse(return_data, safe=False)
 
 def calculate_feeds(feeds, feed_suggestion):
     total_amount = feed_suggestion["total_amount"]
     no_of_feeds = feed_suggestion["feeds"]
     feed_amount = feed_suggestion["amount"]
-    feeds_left = no_of_feeds - len(feeds)
+    feeds_left = int(no_of_feeds) - len(feeds)
     amount_left = total_amount
     for feed in feeds:
         amount_left -= feed.amount
@@ -379,3 +411,14 @@ def calculate_feeds(feeds, feed_suggestion):
     feed_amount = amount_left/feeds_left
     feed_suggestion["amount"] = feed_amount
     return feed_suggestion
+
+def calculate_suggested_feeds(data, feeds_per_day, feed_number, suggested_feeds, feedtotal):
+
+    suggested_feeds["amount"] = round(feedtotal/feed_number, 2)
+    suggested_feeds["suggested_weight"] = round((suggested_feeds["amount"] * feeds_per_day) * 20, 2)
+    suggested_feeds["feeds"] = feeds_per_day
+    suggested_feeds["total_amount"] = round(feedtotal, 2)
+    suggested_feeds["suggested_feeds"] = feeds_per_day
+    suggested_feeds["suggested_amount"] = round(suggested_feeds["suggested_feeds"] * suggested_feeds["amount"], 2)
+    suggested_feeds["date"] = data["date"]
+    return suggested_feeds
