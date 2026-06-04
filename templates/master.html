@@ -91,11 +91,13 @@
                             {% for message in messages %}
                                 <div class="alert alert-{{ message.tags }}" role="alert">
                                     {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
                             {% endfor %}
                         </div>
                     {% endif %}
                     <div class="body-container">
+                        <div id="message_container"></div>
                         {% block content %}
                         {% endblock %}
                     </div>
@@ -131,6 +133,16 @@
         </div>
 
         <script type="text/javascript">
+            function add_message(type, text) {
+                const container = document.createElement('div');
+                container.className = `alert alert-${type} alert-dismissible fade show opacity-100`;
+                container.role = 'alert';
+                container.innerHTML = `
+                    ${text}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('#message_container').prepend(container);
+            }
             function open_bb_modal() {
                 const m = document.getElementById('bb_modal');
                 if (!m) return;
@@ -158,6 +170,9 @@
             
             // Initialize Bootstrap Select
             $(document).ready(function() {
+                message_container = document.getElementById('message_container');
+                body_container = document.querySelector('.body-container');
+                message_container.style.width = body_container.offsetWidth + 'px';
                 const dropdownToggleElement = document.getElementById('navGroups');
                 const dropdownInstance = new bootstrap.Dropdown(dropdownToggleElement);
                 if ($(".nav-dropdown-menu").find(".active").length > 0) {

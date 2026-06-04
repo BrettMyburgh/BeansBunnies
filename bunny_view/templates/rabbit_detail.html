@@ -24,6 +24,17 @@
       .bb-image {width:100%; height:auto; border-radius:4px; object-fit:cover; }
       .bb-info p { margin-bottom: .35rem; }
       .bb-info ul { padding-left: 1rem; margin-top: .2rem; }
+      .weights-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+      .weights-table tr { border-bottom: 1px solid #e9ecef; }
+      .weights-table th, .weights-table td { padding: 0.5rem 0.75rem; text-align: left; }
+      .weights-table th { font-weight: 600; background-color: #f8f9fa; }
+      .weights-table td { color: #495057; }
+      .weights-expand-button { display: inline-block; margin-top: 0.5rem; padding: 0.25rem 0; background: none; border: none; color: #0d6efd; text-decoration: none; cursor: pointer; font-size: 0.95rem; }
+      .weights-expand-button:hover { text-decoration: underline; }
+      .weights-expand-button::after { content: " ▼"; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; }
+      .weights-expand-button[aria-expanded="true"]::after { transform: rotate(180deg); }
+      .remaining-weights { margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #e9ecef; }
+      .remaining-weights.collapsed { display: none; }
 
       @media (max-width: 768px) {
         .bb-main { flex-direction: column-reverse; }
@@ -37,7 +48,7 @@
     </form>
     <div class="bb-header">
       <a class="btn btnPrimary btn-sm" href="{{request.session.previous_page}}">Back</a>
-      <h1 class="bb-title">{{ rabbit.name }}</h1>
+      <h1 class="bb-title">{% if rabbit.name %}{{ rabbit.name }}{% else %}Rabbit {{ rabbit.id }}{% endif %}</h1>
       <button type="submit" form="bb-delete-form" class="btn btn-danger btn-sm ms-auto">Delete</button>
     </div>
     <hr />
@@ -191,19 +202,207 @@
               </div>
             </div>
           </form>
+          {% if kit %}
+            <form id="bunnyAbandoned" method="post" action="{% url 'bunny_view:rabbit_abandon' rabbit.id %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form_details">
+                <div class="row">
+                  <label class="form-label" for="chkAbandoned">Abandoned</label>
+                  <div class="form-input">
+                    <input type="checkbox" id="chkAbandoned" class="form-check-input" name="abandoned" {% if rabbit.abandoned %}checked{% endif %} onchange="abandonedChanged()">
+                  </div>
+                </div>
+              </div>
+              <div id="divAbandonDetails" class="form_details" style="display:none;">
+                <div class="row">
+                  <label class="form-label" for="txtAbandonReason">Reason for abandonment</label>
+                  <div class="form-input">
+                    <input type="text" id="txtAbandonReason" class="form-control" name="abandon_reason" value="{{ abandon_details.abandon_reason }}">
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="form-label" for="txtAbandonDate">Date of abandonment</label>
+                  <div class="form-input">
+                    <input type="date" id="txtAbandonDate" class="form-control" name="abandon_date" value="{{ abandon_details.abandon_date|date:'Y-m-d' }}">
+                  </div>
+                </div>
+                <div class="row">
+                  <label class="form-label" for="chkFostered">Is fostered</label>
+                  <div class="form-input">
+                    <input type="checkbox" id="chkFostered" class="form-check-input" name="fostered" {% if abandon_details.fostered %}checked{% endif %} onchange="fosterChanged()">
+                  </div>
+                </div>
+                <div id="divFosterMom" class="row" style="display: none;">
+                  <label class="form-label" for="selectFosterMom">Foster mom</label>
+                  <!-- <div class="form-input"> -->
+                    <select id="selectFosterMom" name="foster_mom" class="selectpicker col-md-9">
+                      <option value="">Select foster mom</option>
+                      {% for foster in fosters %}
+                        <option value="{{ foster.id }}" {% if abandon_details.foster_mom and abandon_details.foster_mom.id == foster.id %}selected{% endif %}>{{ foster.name }}</option>
+                      {% endfor %}
+                    </select>
+                  <!-- </div> -->
+                </div>
+                <div id="btnSave" class="" style="display: none;">
+                  <button type="submit" class="btn btnPrimary float-end mb-2">Update</button>
+                </div>
+              </div>
+            </form>
+            <div class="accordion accordion-flush" id="accordionFeedWeight">
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="headingWeight">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWeight" aria-expanded="false" aria-controls="collapseWeight">
+                    Weight
+                  </button>
+                </h2>
+                <div id="collapseWeight" class="accordion-collapse collapse" aria-labelledby="headingWeight">
+                  <div class="accordion-body">
+                    <form id="rabbitWeight" method="post" action="{% url 'bunny_view:rabbit_weight' rabbit.id %}" enctype="multipart/form-data" onsubmit="return doAjaxPost(this)">
+                      {% csrf_token %}
+                      <div class="form_details">
+                        {% if weights %}
+                          <table class="weights-table">
+                            <tr>
+                              <th class="tblDate">Date</th>
+                              <th class="tblWeight">Weight (grams)</th>
+                            </tr>
+                            {% for weight in weights|slice:":4" %}
+                              <tr>
+                                <td>{{ weight.date|date:"Y-m-d" }}</td>
+                                <td>{{ weight.weight }}</td>
+                              </tr>
+                            {% endfor %}
+                          </table>
+                          {% if weights|length > 4 %}
+                            <button type="button" class="weights-expand-button" aria-expanded="false" onclick="toggleRemainingWeights(event)">Show {{ weights|length|add:"-4" }} more weights</button>
+                            <div class="remaining-weights collapsed" id="remainingWeights">
+                              <table class="weights-table">
+                                <tr>
+                                  <th class="tblDate">Date</th>
+                                  <th class="tblWeight">Weight (grams)</th>
+                                </tr>
+                                {% for weight in weights|slice:"4:" %}
+                                  <tr>
+                                    <td>{{ weight.date|date:"Y-m-d" }}</td>
+                                    <td>{{ weight.weight }}</td>
+                                  </tr>
+                                {% endfor %}
+                              </table>
+                            </div>
+                          {% endif %}
+                        {% else %}
+                          <table class="weights-table" style="display: none;">
+                            <tr>
+                              <th class="tblDate">Date</th>
+                              <th class="tblWeight">Weight (grams)</th>
+                            </tr>
+                          </table>
+                        {% endif %}
+                        <div class="d-flex">
+                          <button type="button" class="btn btnPrimary" style="margin-top: 0.5rem;" onclick="AddWeight()">Add Weight</button>
+                          <button id="btnWeightSave" type="submit" class="btn btnPrimary ms-auto" style="margin-top: 0.5rem; display:none;">Save Weight</button>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+              <div class="accordion-item accordian-feed">
+                <h2 class="accordion-header" id="headingFeed">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFeed" aria-expanded="false" aria-controls="collapseFeed">
+                    Feed
+                  </button>
+                </h2>
+                <div id="collapseFeed" class="accordion-collapse collapse" aria-labelledby="headingFeed">
+                  <div class="accordion-body">
+                    <form id="rabbitFeed" method="post" action="{% url 'bunny_view:rabbit_feed' rabbit.id %}" enctype="multipart/form-data" onsubmit="return doAjaxPost(this)">
+                      {% csrf_token %}
+                      <div class="form_details">
+                        {% if feeds %}
+                        <table id="tblPastFeeds">
+                          <tr>
+                            <th>Date</th>
+                            <th>Total Food</th>
+                            <th>number of feeds</th>
+                            {% for i in max_feed_number %}
+                              <th>feed {{ i }}</th>
+                            {% endfor %}
+                          </tr>
+                          {% for feed in feeds %}
+                          <tr>
+                            <td id="tdDate">{{ feed.date|date:"Y-m-d" }}</td>
+                            <td id="tdFeedAmount">{{ feed.feed_amount }}</td>
+                            <td id="tdSuggestedFeeds">{{ feed.feed_count }}</td>
+                            {% for feed_item in feed.feeds %}
+                              <td id="tdFeed{{ forloop.counter0 }}">{{ feed_item|default:"-" }}</td>
+                            {% endfor %}
+                          </tr>
+                          {% endfor %}
+                        </table>
+                        {% endif %}
+                        {% if weights or feeds %}
+                        <table id="tblSuggestedFeeds">
+                        {% else %}
+                          <table id="tblSuggestedFeeds" style="display: none;">
+                        {% endif%}
+                          <tr>
+                            <th>Date</th>
+                            <th>feed amount (milliliters)</th>
+                            <th>suggested feeds</th>
+                            <th>suggested amount (milliliters)</th>
+                            <th>suggested weight (grams)</th>
+                          </tr>
+                          <tr>
+                            <td id="tdDate">{% now "Y-m-d" %}</td>
+                            <td id="tdFeedAmount" name="suggestedTotal">{{ feed.amount }}</td>
+                            <td id="tdSuggestedFeeds" name="suggestedFeeds">{{ feed.suggested_feeds }}</td>
+                            <td id="tdSuggestedAmount" name="suggestedAmounts">{{ feed.suggested_amount }}</td>
+                            <td id="tdSuggestedWeight" name="suggestedWeight">{{ feed.suggested_weight }}</td>
+                          </tr>
+                        </table>
+                        <div id="divFeedControls">
+                          <div class="row">
+                            <label class="form-label" for="txtFeeds">Feeds</label>
+                            <div class="form-input">
+                              <input type="number" id="txtFeeds" class="form-control" name="feeds" value="{{ feed.suggested_feeds }}">
+                            </div>
+                          </div>
+                          <div class="row">
+                            <label class="form-label" for="txtFeedAmount">Feed amount (milliliters)</label>
+                            <div class="form-input">
+                              <input type="number" id="txtFeedAmount" class="form-control" name="feed_amount" value="{{ feed.suggested_amount }}">
+                            </div>
+                          </div>
+                          <div>
+                            <button type="submit" class="btn btnPrimary">Calculate</button>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endif %}
       </div>
       <div class="d-block col-md-5">
         <div id="imagesCarousel" class="carousel carousel-dark slide" data-bs-ride="carousel">
           <div class="carousel-inner">
-            {% for image in images %}
-              <div class="carousel-item{% if image.image.url == rabbit.image.url %} active{% endif %}">
-                {% if rabbit.dead %}
-                  <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image grayscale d-block w-100">
-                {% else %}
-                  <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image d-block w-100">
-                {% endif %}
+            {% if images %}
+              {% for image in images %}
+                <div class="carousel-item{% if image.image.url == rabbit.image.url %} active{% endif %}">
+                  {% if rabbit.dead %}
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image grayscale d-block w-100">
+                  {% else %}
+                    <img src="{{ image.image.url }}" alt="{{ rabbit.name }}" data-id="{{image.image_id}}" class="bb-image d-block w-100">
+                  {% endif %}
+                </div>
+              {% endfor%}
+            {% else %}
+              <div class="carousel-item active">
+                <img src="{{rabbit.image.url}}" alt="No image available" class="bb-image d-block w-100">
               </div>
-            {% endfor%}
+            {% endif %}
           </div>
           <button class="carousel-control-prev" type="button" data-bs-target="#imagesCarousel" data-bs-slide="prev">
             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
@@ -391,9 +590,197 @@
         
         document.addEventListener("DOMContentLoaded",function(){
           updateImageActionButtons();
+          var bunnyAbandonedForm = document.getElementById("bunnyAbandoned");
+          if (bunnyAbandonedForm) {
+            var formElements = bunnyAbandonedForm.querySelectorAll("input, select, textarea");
+            formElements.forEach(function(element) {
+              element.addEventListener("change", showBtnSave);
+            });
+          }
         });
 
+        function abandonedChanged(){
+          abdandonDetails = document.getElementById("divAbandonDetails");
+          if(document.getElementById("chkAbandoned").checked){
+            abdandonDetails.style.display = "block";
+            if ("{{ abandon_details.date_of_abandonment }}" == "") {
+              document.getElementById("txtAbandonDate").value = new Date().toISOString().split('T')[0];
+            }
+          } else {
+            abdandonDetails.style.display = "none";
+          }
+        }
 
+        function fosterChanged(){
+          var fosterSelect = document.getElementById("divFosterMom");
+          if(document.getElementById("chkFostered").checked){
+            fosterSelect.style.display = "flex";
+          } else {
+            fosterSelect.style.display = "none";
+          }
+        }
+
+        function showBtnSave(){
+          var btnSave = document.getElementById("btnSave");
+          if (btnSave) {
+            btnSave.style.display = "block";
+          }
+        }
+
+        function hideBtnSave(){
+          var btnSave = document.getElementById("btnSave");
+          if (btnSave) {
+            btnSave.style.display = "none";
+          }
+        }
+
+        function ShowBtn(id){
+          var btnSave = document.getElementById(id);
+          if (btnSave) {
+            btnSave.style.display = "block";
+          }
+        }
+
+        function HideBtn(id){
+          var btnSave = document.getElementById(id);
+          if (btnSave) {
+            btnSave.style.display = "none";
+          }
+        }
+
+        function toggleRemainingWeights(event) {
+          event.preventDefault();
+          var button = event.target.closest('.weights-expand-button');
+          var remainingWeights = document.getElementById('remainingWeights');
+          var isExpanded = button.getAttribute('aria-expanded') === 'true';
+          
+          button.setAttribute('aria-expanded', !isExpanded);
+          remainingWeights.classList.toggle('collapsed', isExpanded);
+          
+          var remainingCount = parseInt(button.textContent.match(/\d+/)[0]);
+          button.textContent = isExpanded ? 
+            'Show ' + remainingCount + ' more weights' : 
+            'Hide ' + remainingCount + ' weights';
+        }
+
+        function AddWeight(){
+          var table = document.querySelector("#rabbitWeight table");
+          table.style.display = "block";
+          var newRow = table.insertRow(-1);
+          var dateCell = newRow.insertCell(0);
+          var weightCell = newRow.insertCell(1);
+          var deleteCell = newRow.insertCell(2);
+          var currentDate = new Date().toISOString().split('T')[0];
+          dateCell.innerHTML = '<input id="new_weight_date_' + newRow.rowIndex + '" type="date" name="weight_date_' + newRow.rowIndex + '" class="form-control" value="' + currentDate + '">';
+          weightCell.innerHTML = '<input id="new_weight_value_' + newRow.rowIndex + '" type="number" name="weight_value_' + newRow.rowIndex + '" class="form-control" step="0.01">';
+          deleteCell.innerHTML = '<button type="button" class="btn btn-close" onclick="DeleteWeight(this)"></button>';
+          ShowBtn("btnWeightSave");
+        }
+        
+        function DeleteWeight(button){
+          var row = button.closest("tr");
+          var table = document.querySelector("#rabbitWeight table");
+          
+          if (row) {
+            row.remove();
+            
+            // Only show button if new rows with inputs exist
+            var hasNewWeights = table.querySelector("input") !== null;
+            if (hasNewWeights) {
+              ShowBtn("btnWeightSave");
+            } else {
+              HideBtn("btnWeightSave");
+            }
+          }
+        }
+
+        function doAjaxPost(form){
+          var formData = new FormData(form);
+          $.ajax({
+            url: form.action,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(data){
+              if(data.button){
+                HideBtn(data.button);
+              }
+              if (data.messages){
+                data.messages.forEach(function(msg){
+                  add_message(msg.tags, msg.message);
+                });
+              }
+              if (data.feed_suggestion){
+                document.getElementById("tblSuggestedFeeds").style.display = "table";
+                document.getElementById("tdDate").textContent = data.feed_suggestion.date;
+                document.getElementById("tdFeedAmount").textContent = data.feed_suggestion.total_amount;
+                document.getElementById("tdSuggestedFeeds").textContent = data.feed_suggestion.suggested_feeds;
+                document.getElementById("tdSuggestedAmount").textContent = data.feed_suggestion.suggested_amount;
+                document.getElementById("tdSuggestedWeight").textContent = data.feed_suggestion.suggested_weight;
+                document.getElementById("txtFeeds").value = data.feed_suggestion.suggested_feeds;
+                document.getElementById("txtFeedAmount").value = data.feed_suggestion.suggested_amount;
+              }
+              if (data.feed){
+                var table = document.getElementById("tblPastFeeds");
+                if (!table) {
+                  table = document.createElement("table");
+                  table.id = "tblPastFeeds";
+                  table.innerHTML = "<tr><th>Date</th><th>Total Food</th><th>number of feeds</th>{% for i in max_feed_number %}<th>feed {{ i }}</th>{% endfor %}</tr>";
+                  form.querySelector(".form_details").prepend(table);
+                }
+                if (table.style.display === "none") {
+                  table.style.display = "table";
+                }
+                
+                // Check if a row for this date already exists
+                var rows = table.getElementsByTagName("tr");
+                var rowFound = false;
+                
+                for (var i = 1; i < rows.length; i++) {
+                  var cells = rows[i].getElementsByTagName("td");
+                  if (cells.length > 0 && cells[0].textContent === data.feed.date) {
+                    // Update existing row
+                    cells[1].textContent = data.feed.amount;
+                    cells[2].textContent = data.feed.number_of_feeds;
+                    if (cells[data.feed.feed_number+2]) {
+                      cells[data.feed.feed_number+2].textContent = data.feed.amount || "-";
+                    }
+                    rowFound = true;
+                    break;
+                  }
+                }
+                
+                // If no row found for this date, create a new one
+                if (!rowFound) {
+                  var newRow = table.insertRow(1);
+                  var dateCell = newRow.insertCell(0);
+                  var feedAmountCell = newRow.insertCell(1);
+                  var feedCountCell = newRow.insertCell(2);
+                  for(i=0; i < data.feed.number_of_feeds; i++){
+                    if (data.feed.feed_number - 1 == i) {
+                      newRow.insertCell(i+3).textContent = data.feed.amount || "-";
+                    } else{
+                      newRow.insertCell(i+3).textContent = "-";
+                    }
+                  }
+                  dateCell.textContent = data.feed.date;
+                  feedAmountCell.textContent = data.feed.amount;
+                  feedCountCell.textContent = data.feed.number_of_feeds;
+                }
+              }
+            },
+            error: function(xhr, status, error){
+              console.error('Form submission error:', error);
+              if(xhr.status === 403){
+                add_message('danger', 'Permission denied. Please refresh and try again.');
+              } else {
+                add_message('danger', 'An error occurred while submitting the form.');
+              }
+            }
+          });
+          return false;
+        }
 
   </script>
 

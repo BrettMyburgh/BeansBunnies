@@ -10,4 +10,7 @@ urlpatterns = [
     path('rabbit/<int:pk>/crop/', views.rabbit_crop, name='rabbit_crop'),
     path('rabbit/<int:pk>/default/', views.rabbit_default, name='rabbit_default'),
     path('rabbit/<int:pk>/image-delete/', views.rabbit_image_delete, name='rabbit_image_delete'),
+    path('rabbit/<int:pk>/abandon/', views.rabbit_abandon, name='rabbit_abandon'),
+    path('rabbit/<int:pk>/weight/', views.rabbit_weight, name='rabbit_weight'),
+    path('rabbit/<int:pk>/feed/', views.rabbit_feed, name='rabbit_feed'),
 ]
